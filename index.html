@@ -1,0 +1,472 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Purity Labs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- AGE VERIFICATION -->
+  <div id="ageGate" class="age-gate">
+    <div class="age-gate-backdrop"></div>
+    <div class="age-gate-modal">
+      <span class="age-gate-logo-text">Purity<span>Labs</span></span>
+      <p class="age-gate-challenge">Are you over 21 years of age?</p>
+      <div class="age-gate-buttons">
+        <button id="ageNo" class="age-btn age-btn-no">No</button>
+        <button id="ageYes" class="age-btn age-btn-yes">Yes</button>
+      </div>
+      <label class="age-gate-remember">
+        <input type="checkbox" checked> Remember me
+      </label>
+    </div>
+  </div>
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="container">
+      <span>FREE SHIPPING STARTS AT $250</span>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="header" id="header">
+    <div class="container header-inner">
+      <a href="#" class="logo">
+        <span class="header-logo-text">Purity<span>Labs</span></span>
+      </a>
+      <nav class="nav" id="nav">
+        <div class="nav-item has-dropdown">
+          <a href="#products" class="nav-link">All Peptides <i class="fa-solid fa-chevron-down nav-arrow"></i></a>
+          <ul class="dropdown">
+            <li><a href="#products">Shop All Peptides</a></li>
+            <li><a href="nasal-sprays.html">Nasal Sprays</a></li>
+            <li><a href="#products">Pills</a></li>
+          </ul>
+        </div>
+        <a href="coas.html" class="nav-link">COAs</a>
+        <a href="about.html" class="nav-link">About Us</a>
+        <a href="mailto:info@puritylabs.org" class="nav-link">info@puritylabs.org</a>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" id="searchBtn" aria-label="Search">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.75 14.7188L11.5625 10.5312C12.4688 9.4375 12.9688 8.03125 12.9688 6.5C12.9688 2.9375 10.0312 0 6.46875 0C2.875 0 0 2.9375 0 6.5C0 10.0938 2.90625 13 6.46875 13C7.96875 13 9.375 12.5 10.5 11.5938L14.6875 15.7812C14.8438 15.9375 15.0312 16 15.25 16C15.4375 16 15.625 15.9375 15.75 15.7812C16.0625 15.5 16.0625 15.0312 15.75 14.7188ZM1.5 6.5C1.5 3.75 3.71875 1.5 6.5 1.5C9.25 1.5 11.5 3.75 11.5 6.5C11.5 9.28125 9.25 11.5 6.5 11.5C3.71875 11.5 1.5 9.28125 1.5 6.5Z" fill="currentColor"/></svg>
+        </button>
+        <button class="icon-btn cart-btn" aria-label="Cart">
+          <svg width="16" height="19" viewBox="0 0 16 19" fill="none"><path d="M14.375 18H1.625V5.25H14.375V18Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 7.5V4.5C5 2.85 6.35 1.5 8 1.5C9.65 1.5 11 2.85 11 4.5V7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="cart-count">0</span>
+        </button>
+        <button class="icon-btn mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+          <svg width="20" height="14" viewBox="0 0 22 16" fill="currentColor"><path d="M0 0h22v2H0zM0 7h10v2H0zM0 14h16v2H0z"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MOBILE NAV -->
+  <div class="mobile-nav" id="mobileNav">
+    <div class="mobile-nav-header">
+      <span class="mobile-nav-title">Menu</span>
+      <button class="icon-btn" id="mobileNavClose" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 22 22" fill="currentColor"><path d="M12.592 11.015l8.988-8.939c.43-.426.43-1.117 0-1.542a1.108 1.108 0 0 0-1.558 0l-8.98 8.931L1.977.401A1.1 1.1 0 0 0 .42.4a1.107 1.107 0 0 0 0 1.562l9.057 9.058-9.09 9.039a1.084 1.084 0 0 0 0 1.543c.43.426 1.129.426 1.558 0l9.082-9.032 9.028 9.028a1.1 1.1 0 0 0 1.557 0c.43-.432.43-1.131 0-1.562l-9.02-9.022z" fill-rule="evenodd"/></svg>
+      </button>
+    </div>
+    <div class="mobile-nav-links">
+      <div class="mobile-nav-group">
+        <a href="#products" class="mobile-nav-link">All Peptides</a>
+        <ul class="mobile-sub-menu">
+          <li><a href="#products">Shop All Peptides</a></li>
+          <li><a href="nasal-sprays.html">Nasal Sprays</a></li>
+          <li><a href="#products">Pills</a></li>
+        </ul>
+      </div>
+      <a href="coas.html" class="mobile-nav-link">COAs</a>
+      <a href="about.html" class="mobile-nav-link">About Us</a>
+      <a href="mailto:info@puritylabs.org" class="mobile-nav-link">info@puritylabs.org</a>
+    </div>
+  </div>
+
+  <!-- SEARCH OVERLAY -->
+  <div class="search-overlay" id="searchOverlay">
+    <button class="search-close" id="searchClose" aria-label="Close search">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="currentColor"><path d="M12.592 11.015l8.988-8.939c.43-.426.43-1.117 0-1.542a1.108 1.108 0 0 0-1.558 0l-8.98 8.931L1.977.401A1.1 1.1 0 0 0 .42.4a1.107 1.107 0 0 0 0 1.562l9.057 9.058-9.09 9.039a1.084 1.084 0 0 0 0 1.543c.43.426 1.129.426 1.558 0l9.082-9.032 9.028 9.028a1.1 1.1 0 0 0 1.557 0c.43-.432.43-1.131 0-1.562l-9.02-9.022z" fill-rule="evenodd"/></svg>
+    </button>
+    <div class="search-content">
+      <form class="search-form" role="search" method="get">
+        <input name="s" type="search" placeholder="Product Search" autocomplete="off" class="search-input">
+        <input type="hidden" name="post_type" value="product">
+        <button type="submit" class="search-submit-btn" aria-label="Search">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M14.962 14.12l4.86 4.86a.6.6 0 0 1-.42 1.02.603.603 0 0 1-.422-.177l-4.86-4.86a8.493 8.493 0 0 1-5.592 2.092C3.827 17.055 0 13.228 0 8.528 0 3.827 3.823 0 8.528 0c4.7 0 8.527 3.823 8.527 8.528 0 2.137-.789 4.093-2.093 5.592zM8.523 1.197c-4.04 0-7.33 3.286-7.33 7.33 0 4.045 3.29 7.336 7.33 7.336 4.045 0 7.33-3.295 7.33-7.335s-3.285-7.33-7.33-7.33z"/></svg>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- HERO (Slider Revolution replacement) -->
+  <section class="hero">
+    <div class="hero-bg">
+      <img src="images/hero.jpg" alt="Research Laboratory">
+    </div>
+    <div class="hero-content">
+      <p class="hero-subtitle-text">For In Vitro Research Use Only</p>
+      <h1 class="hero-title">Precision Research<br>Compounds</h1>
+      <a href="#products" class="btn-hero">SHOP PEPTIDES</a>
+    </div>
+  </section>
+
+  <!-- INDEPENDENTLY TESTED SECTION -->
+  <section class="tested-section">
+    <div class="container tested-grid">
+      <div class="tested-item">
+        <h3>Independently Tested Research Compounds</h3>
+        <p>All products are manufactured and tested to ensure consistency, purity, and reliability for laboratory research.</p>
+      </div>
+      <div class="tested-item">
+        <h3>Third-Party Verified</h3>
+        <p>Each batch is independently tested by accredited laboratories. Certificates of Analysis are available for review.</p>
+      </div>
+      <div class="tested-item">
+        <h3>Research Use Only</h3>
+        <p>All products sold are intended for laboratory and in vitro research purposes only. Not for human or veterinary use.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- POPULAR PEPTIDES -->
+  <section class="products" id="products">
+    <div class="container">
+      <h2 class="section-title-center">Popular Peptides</h2>
+      <div class="products-grid">
+
+        <div class="product-card">
+          <div class="product-img-wrap">
+            <span class="product-badge">Sale!</span>
+            <a href="#" class="product-link"></a>
+            <img src="images/glp3rt-5-scaled-700x700.jpg" alt="GLP-3RT" loading="lazy">
+          </div>
+          <div class="product-info">
+            <div class="product-info-left">
+              <span class="product-cat">ALL PEPTIDES</span>
+              <a href="#" class="product-name"><h3>GLP-3RT</h3></a>
+            </div>
+            <div class="product-info-right">
+              <span class="price"><span class="woocommerce-Price-amount">$54.99</span> &ndash; <span class="woocommerce-Price-amount">$149.99</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img-wrap">
+            <span class="product-badge">Sale!</span>
+            <a href="#" class="product-link"></a>
+            <img src="images/BACTERIOSTATIC-WATER-10-scaled-700x700.jpg" alt="BACTERIOSTATIC WATER" loading="lazy">
+          </div>
+          <div class="product-info">
+            <div class="product-info-left">
+              <span class="product-cat">ALL PEPTIDES</span>
+              <a href="#" class="product-name"><h3>BACTERIOSTATIC WATER</h3></a>
+            </div>
+            <div class="product-info-right">
+              <span class="price"><span class="woocommerce-Price-amount">$19.99</span> &ndash; <span class="woocommerce-Price-amount">$55.99</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img-wrap">
+            <span class="product-badge">Sale!</span>
+            <a href="#" class="product-link"></a>
+            <img src="images/GHK-CU-50-scaled-700x700.jpg" alt="GHK-CU" loading="lazy">
+          </div>
+          <div class="product-info">
+            <div class="product-info-left">
+              <span class="product-cat">ALL PEPTIDES</span>
+              <a href="#" class="product-name"><h3>GHK-CU</h3></a>
+            </div>
+            <div class="product-info-right">
+              <span class="price"><span class="woocommerce-Price-amount">$44.99</span> &ndash; <span class="woocommerce-Price-amount">$74.99</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img-wrap">
+            <span class="product-badge">Sale!</span>
+            <a href="#" class="product-link"></a>
+            <img src="images/45d5e101-6a9f-4649-993c-f432c6c287b2-2-700x700.png" alt="TESAMORELIN" loading="lazy">
+          </div>
+          <div class="product-info">
+            <div class="product-info-left">
+              <span class="product-cat">ALL PEPTIDES</span>
+              <a href="#" class="product-name"><h3>TESAMORELIN</h3></a>
+            </div>
+            <div class="product-info-right">
+              <span class="price"><span class="woocommerce-Price-amount">$50.00</span> &ndash; <span class="woocommerce-Price-amount">$139.00</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img-wrap">
+            <span class="product-badge">Sale!</span>
+            <a href="#" class="product-link"></a>
+            <img src="images/KPV-10-scaled-700x700.jpg" alt="KPV" loading="lazy">
+          </div>
+          <div class="product-info">
+            <div class="product-info-left">
+              <span class="product-cat">ALL PEPTIDES</span>
+              <a href="#" class="product-name"><h3>KPV</h3></a>
+            </div>
+            <div class="product-info-right">
+              <span class="price"><span class="woocommerce-Price-amount">$44.99</span> &ndash; <span class="woocommerce-Price-amount">$119.99</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img-wrap">
+            <span class="product-badge">Sale!</span>
+            <a href="#" class="product-link"></a>
+            <img src="images/GLUTATHIONE-600-scaled-700x700.jpg" alt="GLUTATHIONE" loading="lazy">
+          </div>
+          <div class="product-info">
+            <div class="product-info-left">
+              <span class="product-cat">ALL PEPTIDES</span>
+              <a href="#" class="product-name"><h3>GLUTATHIONE</h3></a>
+            </div>
+            <div class="product-info-right">
+              <span class="price"><span class="woocommerce-Price-amount">$40.00</span> &ndash; <span class="woocommerce-Price-amount">$89.99</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img-wrap">
+            <span class="product-badge">Sale!</span>
+            <a href="#" class="product-link"></a>
+            <img src="images/KLOW-80-scaled-700x700.jpg" alt="KLOW" loading="lazy">
+          </div>
+          <div class="product-info">
+            <div class="product-info-left">
+              <span class="product-cat">ALL PEPTIDES</span>
+              <a href="#" class="product-name"><h3>KLOW</h3></a>
+            </div>
+            <div class="product-info-right">
+              <span class="price"><del aria-hidden="true"><span class="woocommerce-Price-amount">$126.00</span></del> <ins><span class="woocommerce-Price-amount">$112.00</span></ins></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img-wrap">
+            <span class="product-badge">Sale!</span>
+            <a href="#" class="product-link"></a>
+            <img src="images/mots-c-scaled-700x700.jpg" alt="MOTS-C" loading="lazy">
+          </div>
+          <div class="product-info">
+            <div class="product-info-left">
+              <span class="product-cat">ALL PEPTIDES</span>
+              <a href="#" class="product-name"><h3>MOTS-C</h3></a>
+            </div>
+            <div class="product-info-right">
+              <span class="price"><span class="woocommerce-Price-amount">$54.99</span> &ndash; <span class="woocommerce-Price-amount">$139.99</span></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST BADGES -->
+  <section class="trust-badges">
+    <div class="container trust-grid">
+      <div class="trust-card">
+        <div class="trust-icon">
+          <i class="fa-regular fa-circle-check"></i>
+        </div>
+        <h3>VERIFIED >99% PURITY</h3>
+        <p>Every compound undergoes comprehensive testing via HPLC and Mass Spectrometry methods to confirm precise molecular composition and maximum stability.</p>
+      </div>
+      <div class="trust-card">
+        <div class="trust-icon">
+          <i class="fa-solid fa-truck-fast"></i>
+        </div>
+        <h3>SECURE SHIPPING</h3>
+        <p>Your laboratory materials arrive in protected  packaging with expedited processing to preserve integrity throughout delivery.</p>
+      </div>
+      <div class="trust-card">
+        <div class="trust-icon">
+          <i class="fa-solid fa-headset"></i>
+        </div>
+        <h3>DEDICATED SUPPORT</h3>
+        <p>Knowledgeable team members available to address scientific inquiries and fulfillment requirements to keep your research on schedule.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div class="container about-grid">
+      <div class="about-content">
+        <h2 class="about-title">ABOUT PURITY LABS</h2>
+        <div class="about-text">
+          <div class="about-block">
+            <b>About Us</b><br>
+            Purity Labs is a leading provider of laboratory-grade peptides created specifically for scientific research purposes. Through established partnerships with accredited manufacturing facilities, we obtain premium quality materials at competitive industry prices. We take pride in offering exceptional value and comprehensive technical guidance to advance discoveries in peptide and protein research.
+          </div>
+          <div class="about-block">
+            <b>Excellence. Support. Affordability.</b><br>
+            Purity Labs stands as your dependable source for high-purity research peptides. Our commitment is to provide superior customer care and remarkable value, ensuring researchers obtain premium-grade materials critical for their studies without compromising excellence.
+          </div>
+          <div class="about-block">
+            <b>Who We Serve</b><br>
+            We value every client partnership and remain committed to supporting scientists and research institutions worldwide. We are grateful for your confidence in us as your research collaborator.
+          </div>
+        </div>
+      </div>
+      <div class="about-image">
+        <img src="images/pexels-karola-g-8540614-scaled.jpg" alt="About Purity Labs" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" id="faq">
+    <div class="container faq-inner">
+      <h2 class="faq-title">FREQUENTLY ASKED QUESTIONS</h2>
+      <div class="faq-list">
+        <details class="faq-item" open>
+          <summary class="faq-question">
+            <span>Are your products for human use?</span>
+            <span class="faq-icon">
+              <svg class="icon-opened" width="14" height="14" viewBox="0 0 448 512"><path fill="currentColor" d="M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"/></svg>
+              <svg class="icon-closed" width="14" height="14" viewBox="0 0 448 512"><path fill="currentColor" d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"/></svg>
+            </span>
+          </summary>
+          <div class="faq-answer">
+            <p>No. All products are intended strictly for laboratory research.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">
+            <span>Do you provide dosing information?</span>
+            <span class="faq-icon">
+              <svg class="icon-opened" width="14" height="14" viewBox="0 0 448 512"><path fill="currentColor" d="M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"/></svg>
+              <svg class="icon-closed" width="14" height="14" viewBox="0 0 448 512"><path fill="currentColor" d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"/></svg>
+            </span>
+          </summary>
+          <div class="faq-answer">
+            <p>No. Purity Labs does not provide any form of dosing or application guidance.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">
+            <span>Do you provide COAs?</span>
+            <span class="faq-icon">
+              <svg class="icon-opened" width="14" height="14" viewBox="0 0 448 512"><path fill="currentColor" d="M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"/></svg>
+              <svg class="icon-closed" width="14" height="14" viewBox="0 0 448 512"><path fill="currentColor" d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"/></svg>
+            </span>
+          </summary>
+          <div class="faq-answer">
+            <p>Yes. Third-party Certificates of Analysis are available.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">
+            <span>How are orders shipped?</span>
+            <span class="faq-icon">
+              <svg class="icon-opened" width="14" height="14" viewBox="0 0 448 512"><path fill="currentColor" d="M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"/></svg>
+              <svg class="icon-closed" width="14" height="14" viewBox="0 0 448 512"><path fill="currentColor" d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"/></svg>
+            </span>
+          </summary>
+          <div class="faq-answer">
+            <p>Orders ship discreetly with tracking provided.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="container cta-inner">
+      <h2>Advance Your Science Now</h2>
+      <p>Discover our selection of verified, high-purity peptides developed for laboratory excellence.</p>
+      <a href="#products" class="btn-cta">Shop Now</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-main">
+      <div class="container footer-grid">
+        <div class="footer-brand">
+          <span class="footer-logo-text">Purity<span>Labs</span></span>
+          <p class="footer-desc">Ultra-pure amino acid derivatives and proteins manufactured for the research community. Thoroughly analyzed, certified >99% purity.</p>
+          <a href="mailto:info@puritylabs.org" class="footer-email">info@puritylabs.org</a>
+        </div>
+        <div class="footer-links-col">
+          <h4>QUICK LINKS</h4>
+          <ul>
+            <li><a href="#">My account</a></li>
+            <li><a href="#">Shopping Cart</a></li>
+            <li><a href="#">Affiliate Login</a></li>
+            <li><a href="#">Affiliate SignUp</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-col">
+          <h4>INFORMATION</h4>
+          <ul>
+            <li><a href="#">Privacy policy</a></li>
+            <li><a href="#">Refund policy</a></li>
+            <li><a href="#">Shipping Policy</a></li>
+            <li><a href="#">Terms &amp; conditions</a></li>
+            <li><a href="#">Safety</a></li>
+          </ul>
+        </div>
+        <div class="footer-newsletter-col">
+          <h4>GET IN TOUCH</h4>
+          <p>Receive all the latest information on events, sales, &amp; offers.</p>
+          <form class="newsletter-form" id="newsletterForm">
+            <input type="email" placeholder="Enter your email address..." required>
+            <button type="submit" aria-label="Subscribe">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom-bar">
+      <div class="container footer-bottom-inner">
+        <p>&copy;2026 Purity Labs. All rights reserved.</p>
+        <div class="footer-payments">
+          <img src="images/payment_icon.svg" alt="Payment methods">
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-disclaimer">
+      <div class="container">
+        <p class="disclaimer-title">FDA DISCLAIMER</p>
+        <p>The statements on this website have not been evaluated by the U.S. Food and Drug Administration. The products and information provided by Purity Labs are not intended to diagnose, treat, cure, or prevent any disease.
+Purity Labs LLC is a research chemical supplier. We are not a
+ compounding pharmacy or compounding facility as defined under Section 503A of the Federal Food, Drug, and Cosmetic Act, nor are we an outsourcing facility as defined under Section 503B.
+All products are sold for research, laboratory, or analytical purposes only, and are not for human consumption</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
