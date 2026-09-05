@@ -10,6 +10,11 @@
      5. script.js / account.js / admin.js
 */
 
+/* Email API is served from the Render web service. This base is used by
+   script.js / account.js so welcome & order emails are sent even when the
+   storefront is opened from any host (custom domain, local files, etc.). */
+window.EMAIL_API_BASE = 'https://puritylabs.onrender.com';
+
 var FIREBASE_CONFIG = {
   apiKey: "AIzaSyBlxmZYat0cX0DtFCBP_6IE--uOyiE1ksU",
   authDomain: "peptides-21f83.firebaseapp.com",
