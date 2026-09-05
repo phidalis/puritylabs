@@ -450,6 +450,13 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 }
 .coa-row:hover { background: #eee; }
 .coa-row.hidden { display: none; }
+.coa-thumb {
+  flex: 0 0 56px; width: 56px; height: 56px; margin-right: 14px;
+  border-radius: 10px; overflow: hidden; background: #fff;
+  border: 1px solid #e0e0e0;
+  display: flex; align-items: center; justify-content: center;
+}
+.coa-thumb img { width: 100%; height: 100%; object-fit: contain; }
 .coa-product-info { flex: 1; }
 .coa-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: .5px; }
 .coa-product-name { font-weight: 500; margin-top: 2px; color: #181818; }
@@ -460,6 +467,9 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   color: #fff !important; background: #181818; font-weight: 500;
 }
 .coa-btn:hover { opacity: .85; color: #fff !important; }
+.coa-empty { text-align: center; color: #888; padding: 40px 0; font-size: 15px; }
+.product-coa-row { margin: 16px 0; }
+.product-coa-row .coa-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; }
 
 /* COA Lightbox */
 .coa-lightbox {
@@ -2007,6 +2017,12 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   font-size: .85rem; font-weight: 600; color: #666; cursor: pointer; transition: all .3s;
 }
 .account-logout-btn:hover { border-color: #e33548; color: #e33548; }
+.account-dash-btn {
+  display: inline-block; margin-bottom: 12px; padding: 11px 30px; background: #2E7D32;
+  color: #fff !important; border-radius: 8px; font-size: .85rem; font-weight: 600;
+  text-decoration: none; transition: background .3s;
+}
+.account-dash-btn:hover { background: #245e27; }
 
 /* Back to Top */
 .back-to-top {
