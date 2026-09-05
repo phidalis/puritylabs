@@ -1,7 +1,7 @@
 /* ===== PURITY LABS EMAIL ENGINE =====
    Server-side templates + Resend submission for:
      - Welcome email            (new signup)
-     - Order confirmation       (customer, with downloadable .txt receipt attached)
+     - Order confirmation       (customer, with downloadable PDF receipt attached)
      - Admin order notification (configured admin email(s))
 
    Brand colors pulled from the storefront (styles.css):
@@ -12,6 +12,7 @@
 'use strict';
 
 const { Resend } = require('resend');
+const PDFDocument = require('pdfkit');
 
 const BRAND = {
   green: '#2E7D32',
@@ -28,7 +29,7 @@ const BRAND = {
 /* ------------------------------------------------------------------ */
 
 function publicUrl() {
-  return (process.env.PUBLIC_URL || 'https://puritylabs.com').replace(/\/+$/, '');
+  return (process.env.PUBLIC_URL || 'https://puritylabs.org').replace(/\/+$/, '');
 }
 
 function money(n) {
@@ -499,6 +500,111 @@ ${ctx.contactEmail || ''}`.replace(/\n{4,}/g, '\n\n').replace(/^[ \t]+/g, '').tr
 }
 
 /* ------------------------------------------------------------------ */
+/* Attached receipt (PDF file)                                         */
+/* ------------------------------------------------------------------ */
+
+function receiptPDF(order, ctx) {
+  return new Promise((resolve, reject) => {
+    const doc = new PDFDocument({ size: 'A4', margin: 48 });
+    const chunks = [];
+    doc.on('data', c => chunks.push(c));
+    doc.on('end', () => resolve(Buffer.concat(chunks)));
+    doc.on('error', reject);
+
+    const siteName = ctx.siteName || 'Purity Labs';
+    const green = '#2E7D32';
+    const ink = '#181818';
+    const muted = '#666666';
+
+    doc.rect(0, 0, doc.page.width, 96).fill(green);
+    doc.fill('#ffffff').font('Helvetica-Bold').fontSize(26).text(siteName, 48, 42);
+    doc.font('Helvetica').fontSize(11).text('ORDER', 420, 46, { width: 120, align: 'right' });
+    doc.text('RECEIPT', 420, 60, { width: 120, align: 'right' });
+    doc.moveTo(48, 96).lineTo(doc.page.width - 48, 96).strokeColor('#ECECEC').stroke();
+
+    let y = 120;
+    doc.fill(ink).font('Helvetica-Bold').fontSize(13).text('Order ' + (order.id || '-'), 48, y);
+    doc.font('Helvetica').fontSize(11).fill(muted).text(
+      'Placed: ' + fmtDate(order.date) + '    Status: ' + ((order.status || 'processing').toUpperCase()),
+      300, y
+    );
+    y += 40;
+
+    doc.strokeColor('#ECECEC').lineWidth(1);
+    doc.moveTo(48, y).lineTo(doc.page.width - 48, y).stroke();
+    y += 14;
+
+    doc.fill(muted).font('Helvetica-Bold').fontSize(10).text('ITEM', 48, y);
+    doc.text('QTY', 430, y, { width: 40, align: 'right' });
+    doc.text('TOTAL', 500, y, { width: 80, align: 'right' });
+    y += 18;
+
+    (order.items || []).forEach(item => {
+      const qty = Number(item.qty) || 1;
+      const total = lineTotal(item);
+      const name = String(item.name || 'Product') + (item.variation ? ' (' + item.variation + ')' : '');
+      const disc = qty >= 4 ? '  (20% bulk discount)' : '';
+      doc.fill(ink).font('Helvetica').fontSize(11).text(name, 48, y, { width: 370, ellipsis: true });
+      doc.font('Helvetica').fontSize(11).text(String(qty), 430, y, { width: 40, align: 'right' });
+      doc.text(money(total), 500, y, { width: 80, align: 'right' });
+      if (disc) {
+        doc.fill(muted).fontSize(9).text(disc, 48, y + 14, { width: 300 });
+        y += 12;
+      }
+      y += 22;
+    });
+
+    y += 4;
+    doc.moveTo(48, y).lineTo(doc.page.width - 48, y).stroke();
+    y += 12;
+
+    const rows = [
+      ['Subtotal', money(order.subtotal)],
+      ['Shipping', (Number(order.shipping) === 0 ? 'FREE' : money(order.shipping))],
+      ['TOTAL', money(order.total)]
+    ];
+    rows.forEach(r => {
+      const isTotal = r[0] === 'TOTAL';
+      doc.font(isTotal ? 'Helvetica-Bold' : 'Helvetica').fontSize(isTotal ? 13 : 11)
+        .fill(isTotal ? green : ink).text(r[0], 440, y, { width: 40, align: 'left' });
+      doc.font('Helvetica-Bold').fontSize(11).fill(ink).text(r[1], 500, y, { width: 80, align: 'right' });
+      y += isTotal ? 24 : 16;
+    });
+
+    y += 12;
+    doc.moveTo(48, y).lineTo(doc.page.width - 48, y).stroke();
+    y += 20;
+
+    doc.fill(ink).font('Helvetica-Bold').fontSize(11).text('BILLED TO', 48, y);
+    doc.font('Helvetica').fontSize(11).fill(muted).text([
+      order.customer || '', order.email || ''
+    ].filter(Boolean).join('\n') || '-', 48, y + 16);
+    y += 70;
+
+    const address = [order.address, order.city, order.state, order.zip].filter(Boolean).join(', ') || '—';
+    doc.fill(ink).font('Helvetica-Bold').fontSize(11).text('SHIPPING ADDRESS', 48, y);
+    doc.font('Helvetica').fontSize(11).fill(muted).text([
+      address, order.phone ? 'Phone: ' + order.phone : ''
+    ].filter(Boolean).join('\n'), 48, y + 16);
+    y += 70;
+
+    doc.font('Helvetica').fontSize(11).fill(muted).text('Payment method: ' + (order.method || (order.payment || 'Card')), 48, y, { width: 300 });
+
+    doc.moveTo(48, doc.page.height - 100).lineTo(doc.page.width - 48, doc.page.height - 100).strokeColor('#ECECEC').stroke();
+    doc.font('Helvetica').fontSize(9).fill(muted).text(
+      'Thank you for your order!',
+      48, doc.page.height - 88, { width: 300 }
+    );
+    doc.font('Helvetica').fontSize(9).fill(muted).text(
+      (ctx.storeAddress || '') + (ctx.contactEmail ? '\n' + ctx.contactEmail : ''),
+      48, doc.page.height - 88, { width: 250, align: 'right' }
+    );
+
+    doc.end();
+  });
+}
+
+/* ------------------------------------------------------------------ */
 /* Resend sender                                                       */
 /* ------------------------------------------------------------------ */
 
@@ -585,17 +691,24 @@ async function sendWelcome({ to, name, settings }) {
 async function sendOrderConfirmation({ to, order, settings }) {
   const ctx = settings || {};
   const mail = orderConfirmationHTML(order, ctx);
-  const filename = 'Purity-Labs-Receipt-' + String(order.id || 'order').replace(/[^a-zA-Z0-9_-]/g, '') + '.txt';
+  const filename = 'Purity-Labs-Receipt-' + String(order.id || 'order').replace(/[^a-zA-Z0-9_-]/g, '') + '.pdf';
+  let receipt;
+  try {
+    receipt = await receiptPDF(order, ctx);
+  } catch (e) {
+    console.error('[mail] PDF receipt generation failed:', e.message);
+    receipt = null;
+  }
+  const attachments = receipt
+    ? [{ filename, content: receipt }]
+    : [{ filename: filename.replace(/\.pdf$/, '.txt'), content: receiptText(order, ctx) }];
   return deliver({
     from: fromAddress(ctx),
     to,
     subject: mail.subject,
     html: mail.html,
     text: stripTags(mail.html),
-    attachments: [{
-      filename,
-      content: receiptText(order, ctx)
-    }]
+    attachments
   });
 }
 
@@ -624,6 +737,7 @@ module.exports = {
     welcome: welcomeHTML,
     order: orderConfirmationHTML,
     admin: adminNotificationHTML,
-    receipt: receiptText
+    receipt: receiptText,
+    receiptPDF
   }
 };
