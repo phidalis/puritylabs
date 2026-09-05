@@ -512,7 +512,7 @@ try {
 function fromAddress(ctx) {
   const configured = process.env.RESEND_FROM || '';
   const storeFrom = ctx.fromEmail || '';
-  let raw = (configured || storeFrom || 'no-reply@puritylabs.com').trim();
+  let raw = (configured || storeFrom || '').trim();
 
   /* If the opaque string already contains a working display-name pair, use it. */
   const pair = /^\s*([^<>\r\n]{1,80})\s*<([^<>\s@]+@[^<>\s@]+)>\s*$/.exec(raw);
@@ -521,14 +521,21 @@ function fromAddress(ctx) {
     return cleanName + ' <' + pair[2] + '>';
   }
 
-  /* Otherwise build it from a display name + a bare address. */
-  let siteName = String(ctx.siteName || 'Purity Labs').trim()
-    .replace(/[<>\r\n\[\]]/g, '').slice(0, 60) || 'Purity Labs';
-  const addr = raw.replace(/[<>\r\n ]/g, '').replace(/^.*<(.+)>$/, '$1');
+  /* Normalise a bare URL to "info@domain" (e.g. "https://puritylabs.org" -> "info@puritylabs.org"). */
+  let addr = raw;
+  const urlMatch = /^(?:https?:\/\/)?(?:www\.)?([a-z0-9.-]+\.[a-z]{2,})(?:\/.*)?$/i.exec(raw);
+  if (urlMatch && !/@/.test(raw)) {
+    addr = 'info@' + urlMatch[1];
+  }
+  addr = addr.replace(/[<>\r\n ]/g, '').replace(/^.*<(.+)>$/, '$1');
+  if (!addr) addr = 'info@puritylabs.org';
+
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(addr)) {
     console.error('[mail] invalid from address:', JSON.stringify(addr));
     return addr;
   }
+  const siteName = String(ctx.siteName || 'Purity Labs').trim()
+    .replace(/[<>\r\n\[\]]/g, '').slice(0, 60) || 'Purity Labs';
   return siteName + ' <' + addr + '>';
 }
 
