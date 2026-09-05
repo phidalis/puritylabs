@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account — Purity Labs</title>
+  <meta name="description" content="Your Purity Labs account dashboard — orders, wishlist, cart and profile.">
+  <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="account.css">
+</head>
+<body>
+
+  
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <span class="header-logo-text">Purity<span>Labs</span></span>
+      </a>
+      <nav class="nav">
+        <a href="index.html#products" class="nav-link">All Peptides</a>
+        <a href="pages/nasal-sprays.html" class="nav-link">Nasal Sprays</a>
+        <a href="pages/coas.html" class="nav-link">COAs</a>
+        <a href="pages/about.html" class="nav-link">About Us</a>
+      </nav>
+      <div class="header-actions">
+        <a href="cart.html" class="icon-btn cart-btn" aria-label="Cart">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span class="cart-count" id="cartCount">0</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- AUTH VIEW (logged out) -->
+  <section class="auth-view" id="authView">
+    <div class="container auth-layout">
+      <div class="auth-intro">
+        <p class="auth-eyebrow">PURITY LABS CUSTOMER PORTAL</p>
+        <h1>Your research account,<br>in one place.</h1>
+        <p class="auth-sub">Sign in or create a free account to track orders, save wishlists, manage your cart and reorder your favorite compounds in seconds.</p>
+        <ul class="auth-benefits">
+          <li><i class="fa-solid fa-circle-check"></i><div><b>Order history</b><span>Every order, status and invoice in your library.</span></div></li>
+          <li><i class="fa-solid fa-heart"></i><div><b>Persistent wishlist</b><span>Your saved products follow you across devices.</span></div></li>
+          <li><i class="fa-solid fa-bolt"></i><div><b>One-tap reorder</b><span>Re-add past products straight to your cart.</span></div></li>
+          <li><i class="fa-solid fa-shield-halved"></i><div><b>Secure &amp; private</b><span>Protected by Firebase Auth — data synced to the cloud.</span></div></li>
+        </ul>
+        <div class="auth-trust">
+          <i class="fa-solid fa-lock"></i> Research use only · no data leaves your device
+        </div>
+      </div>
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <button class="auth-tab active" data-tab="login" id="tabLogin">Sign In</button>
+          <button class="auth-tab" data-tab="register" id="tabRegister">Create Account</button>
+        </div>
+        <form class="auth-form" id="loginForm">
+          <div class="auth-field">
+            <label>Email Address</label>
+            <input type="email" id="loginEmail" placeholder="you@example.com" required>
+          </div>
+          <div class="auth-field">
+            <label>Password</label>
+            <input type="password" id="loginPass" placeholder="Enter your password" required>
+          </div>
+          <button type="submit" class="auth-submit-btn">Sign In</button>
+          <p class="account-note">Protected account — orders, cart &amp; profile synced securely via Firebase.</p>
+        </form>
+        <form class="auth-form" id="registerForm" style="display:none;">
+          <div class="auth-field">
+            <label>Full Name</label>
+            <input type="text" id="regName" placeholder="Your name" required>
+          </div>
+          <div class="auth-field">
+            <label>Email Address</label>
+            <input type="email" id="regEmail" placeholder="you@example.com" required>
+          </div>
+          <div class="auth-field">
+            <label>Password</label>
+            <input type="password" id="regPass" placeholder="Create a password" required>
+          </div>
+          <button type="submit" class="auth-submit-btn">Create Account</button>
+          <p class="auth-note">Protected account — orders, cart &amp; profile synced securely via Firebase.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD VIEW (logged in) -->
+  <section class="dash-view" id="dashView" style="display:none;">
+    <div class="container">
+      <div class="dash-head">
+        <div class="dash-greet">
+          <div class="dash-avatar" id="dashAvatar">U</div>
+          <div>
+            <p class="dash-eyebrow">WELCOME BACK</p>
+            <h1 id="dashUserName">User</h1>
+            <p class="dash-sub" id="dashUserEmail">user@example.com</p>
+          </div>
+        </div>
+        <div class="dash-head-actions">
+          <a href="index.html#products" class="btn-outline"><i class="fa-solid fa-bag-shopping"></i> Continue Shopping</a>
+          <button class="btn-outline btn-logout" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+        </div>
+      </div>
+
+      <div class="dash-layout">
+        <aside class="dash-side">
+          <button class="dash-tab active" data-panel="overview"><i class="fa-solid fa-gauge-high"></i> Overview</button>
+          <button class="dash-tab" data-panel="orders"><i class="fa-solid fa-receipt"></i> Orders <span class="dash-count" id="ordersCount">0</span></button>
+          <button class="dash-tab" data-panel="wishlist"><i class="fa-solid fa-heart"></i> Wishlist <span class="dash-count" id="wishCount">0</span></button>
+          <button class="dash-tab" data-panel="cart"><i class="fa-solid fa-bag-shopping"></i> Cart <span class="dash-count" id="dashCartCount">0</span></button>
+          <button class="dash-tab" data-panel="profile"><i class="fa-solid fa-user-cog"></i> Profile</button>
+        </aside>
+
+        <main class="dash-main">
+          <!-- OVERVIEW -->
+          <div class="dash-panel active" id="panel-overview">
+            <div class="stat-grid">
+              <div class="stat-card"><p class="stat-label">Total Orders</p><p class="stat-value" id="ovOrders">0</p></div>
+              <div class="stat-card"><p class="stat-label">Lifetime Spend</p><p class="stat-value" id="ovSpend">$0.00</p></div>
+              <div class="stat-card"><p class="stat-label">Wishlist Items</p><p class="stat-value" id="ovWish">0</p></div>
+              <div class="stat-card"><p class="stat-label">Cart Items</p><p class="stat-value" id="ovCart">0</p></div>
+            </div>
+            <div class="dash-card">
+              <div class="dash-card-head"><h3>Recent Orders</h3><button class="link-btn" data-goto-panel="orders">View all</button></div>
+              <div id="recentOrders"></div>
+            </div>
+            <div class="dash-card">
+              <div class="dash-card-head"><h3>Quick Actions</h3></div>
+              <div class="quick-grid">
+                <a class="quick-action" href="index.html#products"><i class="fa-solid fa-capsules"></i><span>Shop peptides</span></a>
+                <a class="quick-action" href="pages/nasal-sprays.html"><i class="fa-solid fa-wind"></i><span>Nasal sprays</span></a>
+                <a class="quick-action" href="pages/coas.html"><i class="fa-solid fa-file-circle-check"></i><span>Cert of Analysis</span></a>
+                <a class="quick-action" href="cart.html"><i class="fa-solid fa-bag-shopping"></i><span>Open cart</span></a>
+              </div>
+            </div>
+          </div>
+
+          <!-- ORDERS -->
+          <div class="dash-panel" id="panel-orders">
+            <div class="dash-card">
+              <div class="dash-card-head"><h3>Order History</h3></div>
+              <div id="ordersList"></div>
+            </div>
+          </div>
+
+          <!-- WISHLIST -->
+          <div class="dash-panel" id="panel-wishlist">
+            <div class="dash-card">
+              <div class="dash-card-head"><h3>Your Wishlist</h3></div>
+              <div id="wishlistList"></div>
+            </div>
+          </div>
+
+          <!-- CART -->
+          <div class="dash-panel" id="panel-cart">
+            <div class="dash-card">
+              <div class="dash-card-head"><h3>Your Cart</h3></div>
+              <div id="cartList"></div>
+            </div>
+          </div>
+
+          <!-- PROFILE -->
+          <div class="dash-panel" id="panel-profile">
+            <div class="dash-card">
+              <div class="dash-card-head"><h3>Profile</h3></div>
+              <form id="profileForm" class="auth-form" style="max-width:420px;">
+                <div class="auth-field"><label>Full Name</label><input type="text" id="profName" required></div>
+                <div class="auth-field"><label>Email Address</label><input type="email" id="profEmail" required></div>
+                <button type="submit" class="auth-submit-btn">Save Changes</button>
+                <p class="auth-note">Protected account — orders, cart &amp; profile synced securely via Firebase.</p>
+              </form>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="footer-logo-text">Purity<span>Labs</span></span>
+        <p>Ultra-pure research peptides and nasal sprays. Thoroughly analyzed, certified &gt;99% purity.</p>
+      </div>
+      <div class="footer-links-col">
+        <h4>QUICK LINKS</h4>
+        <ul>
+          <li><a href="pages/all-peptides.html">Shop All Peptides</a></li>
+          <li><a href="pages/nasal-sprays.html">Nasal Sprays</a></li>
+          <li><a href="cart.html">Shopping Cart</a></li>
+        </ul>
+      </div>
+      <div class="footer-links-col">
+        <h4>INFORMATION</h4>
+        <ul>
+          <li><a href="pages/coas.html">Certificates of Analysis</a></li>
+          <li><a href="pages/privacy.html">Privacy Policy</a></li>
+          <li><a href="pages/refund.html">Refund Policy</a></li>
+          <li><a href="pages/safety.html">Safety Data</a></li>
+        </ul>
+      </div>
+      <div class="footer-links-col">
+        <h4>RESEARCH USE</h4>
+        <p style="font-size:.8rem;color:#9db3a6;line-height:1.6;">All products are intended for laboratory research use only. Not for human consumption.</p>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>&copy;2026 Purity Labs. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <div class="toasts" id="toasts"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="pdb.js"></script>
+  <script src="account.js"></script>
+</body>
+</html>

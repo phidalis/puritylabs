@@ -1,0 +1,155 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /* ============================================================
+       HELPERS
+       ============================================================ */
+
+    // Signed in as anyone
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Signed in and profile doc exists with role == 'admin'
+    function isAdmin() {
+      return signedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    // Storefront users may never change their own role (no self-escalation).
+    // Role changes (e.g. promoting a customer to admin) are done by an admin
+    // from the admin dashboard — see match /users/{uid} below.
+    function roleUnchanged() {
+      return request.resource.data.role == resource.data.role;
+    }
+
+
+    /* ============================================================
+       USERS + per-user subcollections (cart / wishlist)
+       ============================================================ */
+
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      // Self-registration on the storefront always creates a customer profile.
+      // Admins may also create a profile (e.g. a brand-new admin account) from
+      // the console, or update any profile including the role.
+      allow create: if (isOwner(uid) && request.resource.data.role == 'customer') || isAdmin();
+      // Users keep their own details (role unchanged); admins may change any
+      // profile, including promoting/demoting the role.
+      allow update: if (isOwner(uid) && roleUnchanged()) || isAdmin();
+      allow delete: if isAdmin();
+
+      match /cart/{itemId} {
+        allow read, create, update, delete: if isOwner(uid);
+      }
+
+      match /wishlist/{itemId} {
+        allow read, create, update, delete: if isOwner(uid);
+      }
+    }
+
+
+    /* ============================================================
+       STOREFRONT CATALOG (public read, admin write)
+       ============================================================ */
+
+    match /products/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /categories/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /nav/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /media/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Live content blocks (hero, topbar, trust cards, footer). Single doc: home
+    match /content/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Storefront config (free-shipping threshold, flat rate, announcement, …). Single doc: config
+    match /settings/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+
+    /* ============================================================
+       COUPONS — public read only while published/active (demo client-side
+       validation still needs the values); admin writes everything.
+       ============================================================ */
+
+    match /coupons/{id} {
+      allow read: if isAdmin() || resource.data.active == true;
+      allow write: if isAdmin();
+    }
+
+
+    /* ============================================================
+       NEWSLETTER — storefront visitors subscribe by email (public create),
+       only admin can read/delete the subscriber list.
+       ============================================================ */
+
+    match /newsletter/{id} {
+      allow create: if request.resource.data.email is string
+        && request.resource.data.email.size() > 3;
+      allow read, update, delete: if isAdmin();
+    }
+
+
+    /* ============================================================
+       ORDERS — a signed-in customer or a guest can place an order (it must
+       start as 'processing'). Customers can read their own orders back;
+       everything else (status changes, all admin actions) is isAdmin.
+       ============================================================ */
+
+    function isCustomerOrder() {
+      return signedIn()
+        && request.resource.data.customerId == request.auth.uid
+        && request.resource.data.status == 'processing'
+        && !request.resource.data.keys().hasAny(['isGuest']);
+    }
+
+    function isGuestOrder() {
+      return !signedIn()
+        && request.resource.data.customerId == 'guest'
+        && request.resource.data.isGuest == true
+        && request.resource.data.status == 'processing';
+    }
+
+    match /orders/{id} {
+      allow create: if isCustomerOrder() || isGuestOrder();
+      allow read: if isAdmin()
+        || (signedIn() && resource.data.customerId == request.auth.uid);
+      allow update, delete: if isAdmin();
+    }
+
+
+    /* ============================================================
+       VISITS — anyone may record a visit (public create), only admin reads.
+       ============================================================ */
+
+    match /visits/{id} {
+      allow read, update, delete: if isAdmin();
+      allow create: if true;
+    }
+
+  }
+}
