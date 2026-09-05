@@ -511,10 +511,25 @@ try {
 
 function fromAddress(ctx) {
   const configured = process.env.RESEND_FROM || '';
-  const storeFrom = ctx.fromEmail || 'no-reply@puritylabs.com';
-  const raw = configured || storeFrom;
-  if (/<.*>/.test(raw)) return raw;
-  return (ctx.siteName || 'Purity Labs') + ' <' + raw + '>';
+  const storeFrom = ctx.fromEmail || '';
+  let raw = (configured || storeFrom || 'no-reply@puritylabs.com').trim();
+
+  /* If the opaque string already contains a working display-name pair, use it. */
+  const pair = /^\s*([^<>\r\n]{1,80})\s*<([^<>\s@]+@[^<>\s@]+)>\s*$/.exec(raw);
+  if (pair) {
+    const cleanName = pair[1].trim().replace(/[<>\r\n\[\]]/g, '').slice(0, 60);
+    return cleanName + ' <' + pair[2] + '>';
+  }
+
+  /* Otherwise build it from a display name + a bare address. */
+  let siteName = String(ctx.siteName || 'Purity Labs').trim()
+    .replace(/[<>\r\n\[\]]/g, '').slice(0, 60) || 'Purity Labs';
+  const addr = raw.replace(/[<>\r\n ]/g, '').replace(/^.*<(.+)>$/, '$1');
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(addr)) {
+    console.error('[mail] invalid from address:', JSON.stringify(addr));
+    return addr;
+  }
+  return siteName + ' <' + addr + '>';
 }
 
 function splitEmails(list) {
@@ -533,7 +548,7 @@ async function deliver(mail) {
   try {
     const { data, error } = await resend.emails.send(mail);
     if (error || !data) {
-      console.error('[mail] send failed:', error);
+      console.error('[mail] send failed:', error, 'from:', JSON.stringify(mail.from), 'to:', JSON.stringify(mail.to));
       return { ok: false, error: error && error.message || 'Resend returned an error.' };
     }
     console.log('[mail] sent "' + mail.subject + '" ->', Array.isArray(mail.to) ? mail.to.join(', ') : mail.to, 'id:', data.id);
