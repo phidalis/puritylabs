@@ -6,7 +6,7 @@
    Environment variables (set on Render -> Environment):
      RESEND_API_KEY       required   your Resend API key (app.resend.com)
      RESEND_FROM          optional   verified sender, e.g. "Purity Labs <no-reply@puritylabs.com>"
-     PUBLIC_URL           optional   https://your-app.onrender.com (used for links in emails)
+     PUBLIC_URL           optional   https://puritylabs.onrender.com (used for links in emails)
      PORT                 provided automatically by Render
 */
 

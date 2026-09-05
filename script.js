@@ -3,6 +3,27 @@
    Guests are prompted to sign in before adding items to cart / wishlist.
 */
 
+// ===== RENDER KEEP-ALIVE (invisible to client) =====
+// Pings the Render service on page load so it stays awake/warm. This avoids
+// the first request after a sleep triggering a slow cold-start (which would
+// delay sending emails). It runs silently in the background — nothing shows
+// in the UI.
+(function () {
+  const RENDER_URL = 'https://puritylabs.onrender.com';
+  if (!navigator.onLine) return;
+  const ping = function () {
+    try {
+      fetch(RENDER_URL + '/api/health', { method: 'GET', mode: 'no-cors', cache: 'no-store' }).catch(() => {});
+    } catch (e) { /* ignore */ }
+  };
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    ping();
+  } else {
+    document.addEventListener('DOMContentLoaded', ping);
+  }
+  setInterval(ping, 5 * 60 * 1000);
+})();
+
 // ===== AGE GATE (homepage only) =====
 document.addEventListener('DOMContentLoaded', () => {
   const ageGate = document.getElementById('ageGate');
@@ -127,7 +148,7 @@ const DB = { user: null, cart: [], wishlist: [], products: [], settings: {}, con
 // ===== EMAIL CLIENT (Resend via /api) =====
 // Hosted on the same Render service, so /api/… works in the browser with no
 // extra config. If the storefront is ever hosted somewhere else, set URL before:
-//   window.EMAIL_API_BASE = 'https://your-app.onrender.com';
+//   window.EMAIL_API_BASE = 'https://puritylabs.onrender.com';
 window.PurityMail = {
   base: (window.EMAIL_API_BASE || '').replace(/\/+$/, ''),
   headers() {

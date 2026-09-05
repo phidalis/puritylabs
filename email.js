@@ -218,7 +218,7 @@ function stripTags(html) {
 
 function welcomeHTML(ctx) {
   const firstName = String(ctx.name || 'there').trim().split(/\s+/)[0];
-  const url = publicUrl() || 'https://YOUR-RENDER-URL.onrender.com';
+  const url = publicUrl() || 'https://puritylabs.onrender.com';
   const subject = 'Welcome to ' + ctx.siteName + ' — your account is ready';
 
   const body = `
@@ -350,7 +350,7 @@ function addressBlockHTML(title, order) {
 }
 
 function orderConfirmationHTML(order, ctx) {
-  const url = publicUrl() || 'https://YOUR-RENDER-URL.onrender.com';
+  const url = publicUrl() || 'https://puritylabs.onrender.com';
   const subject = ctx.siteName + ' — Order ' + order.id + ' confirmed';
   const firstName = String(order.customer || 'there').trim().split(/\s+/)[0];
 
