@@ -196,7 +196,7 @@
         <div class="footer-links-col">
           <h4>QUICK LINKS</h4>
           <ul>
-            <li><a href="javascript:void(0)" class="footer-account-link" onclick="document.getElementById('accountOverlay').classList.add('open');document.getElementById('accountModal').classList.add('open');return false;">My Account</a></li>
+            <li><a href="../account.html">My Account</a></li>
             <li><a href="../cart.html">Shopping Cart</a></li>
           </ul>
         </div>
@@ -262,7 +262,7 @@ All products are sold for research, laboratory, or analytical purposes only, and
         <input type="password" placeholder="Enter password" required>
       </div>
       <button type="submit" class="account-submit-btn">Sign In</button>
-      <p class="account-note">Demo only � data stored in your browser.</p>
+      <p class="account-note">Protected account � orders, cart & profile synced securely via Firebase.</p>
     </form>
     <form class="account-form" id="registerForm" style="display:none;">
       <div class="account-field">
@@ -278,12 +278,13 @@ All products are sold for research, laboratory, or analytical purposes only, and
         <input type="password" placeholder="Create password" required>
       </div>
       <button type="submit" class="account-submit-btn">Create Account</button>
-      <p class="account-note">Demo only � data stored in your browser.</p>
+      <p class="account-note">Protected account � orders, cart & profile synced securely via Firebase.</p>
     </form>
     <div class="account-logged-in" id="accountLoggedIn" style="display:none;">
       <div class="account-avatar"><i class="fa-solid fa-user"></i></div>
       <h3 id="accountName">User</h3>
       <p id="accountEmail">user@example.com</p>
+      <a href="../account.html" class="account-dash-btn"><i class="fa-solid fa-gauge-high"></i> Go to My Dashboard</a>
       <button class="account-logout-btn" id="accountLogout">Sign Out</button>
     </div>
   </div>
@@ -304,6 +305,10 @@ All products are sold for research, laboratory, or analytical purposes only, and
       <a href="../index.html#products" class="side-cart-continue">Continue Shopping</a>
     </div>
   </div>
-<script src="../script.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="../pdb.js"></script>
+  <script src="../script.js"></script>
 </body>
 </html>

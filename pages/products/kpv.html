@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-  <meta name="description" content="KPV � Purity Labs research compound. Available in multiple sizes." />
+  <meta name="description" content="KPV - Purity Labs research compound. Available in multiple sizes." />
   <title>KPV - Purity Labs</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,7 +58,7 @@
       </nav>
       <div class="header-actions">
         <button class="icon-btn" id="searchBtn" aria-label="Search">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.75 14.7188L11.5625 10.5312C12.4688 9.4375 12.9688 8.03125 12.9688 6.5C12.9688 2.9375 10.0312 0 6.46875 0C2.875 0 0 2.9375 0 6.5C0 10.0938 2.90625 13 6.46875 13C7.96875 13 9.375 12.5 10.5 11.5938L14.6875 15.7812C14.8438 15.9375 15.0312 16 15.25 16C15.4375 16 15.625 15.9375 15.75 15.7812C16.0625 15.5 16.0625 15.0312 15.75 14.7188ZM1.5 6.5C1.5 3.75 3.71875 1.5 6.5 1.5C9.25 1.5 11.5 3.75 11.5 6.5C11.5 9.28125 9.25 11.5 6.5 11.5C3.71875 11.5 1.5 9.28125 1.5 6.5Z" fill="currentColor"/></svg>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.75 14.7188L11.5625 10.5312C12.4688 9.4375 12.9688 8.03125 12.9688 6.5C12.9688 2.9375 10.0312 0 6.46875 0C2.875 0 0 2.9375 0 6.5C0 10.0938 2.90625 13 6.46875 13C7.96875 13 9.375 12.5 10.5 11.5938L14.6875 15.7812C14.8438 15.9375 15.0312 16 15.25 16C15.4375 16 15.625 15.9375 15.75 15.7812C16.0625 15.5 16.0625 15.0312 15.75 14.7188ZM1.5 6.5C1.5 3.75 3.71875 1.5 6.5 1.5C9.25 1.5 11.5 3.75 11.5 6.5C11.5 9.28125 11.5 6.5 11.5 3.71875 11.5 1.5 9.28125 1.5 6.5Z" fill="currentColor"/></svg>
         </button>
         <button class="icon-btn cart-btn" id="cartBtn" aria-label="Cart">
           <svg width="16" height="19" viewBox="0 0 16 19" fill="none"><path d="M14.375 18H1.625V5.25H14.375V18Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 7.5V4.5C5 2.85 6.35 1.5 8 1.5C9.65 1.5 11 2.85 11 4.5V7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -141,20 +141,9 @@
         <div class="product-summary">
           <h1 class="product-summary-title">KPV</h1>
           <div class="product-summary-price">
-            <del aria-hidden="true"><span class="woocommerce-Price-amount">$53.99 – $143.99</span></del>
-            <ins aria-hidden="true"><span class="woocommerce-Price-amount">$44.99 – $119.99</span></ins>
+            <span class="woocommerce-Price-amount">$53.99</span>
           </div>
           <div class="product-summary-sku">SKU: <b>PL-KPV</b></div>
-
-          <!-- VARIATIONS -->
-          <div class="product-variations">
-            <div class="product-variations-label">Strength: <b>10mg</b></div>
-            <div class="variation-options">
-              <button class="variation-option active" data-price="44.99">10mg</button>
-              <button class="variation-option" data-price="69.99">20mg</button>
-              <button class="variation-option" data-price="119.99">50mg</button>
-            </div>
-          </div>
 
           <!-- QUANTITY + ADD TO CART -->
           <div class="product-quantity-row">
@@ -171,15 +160,15 @@
           <!-- BULK SAVINGS -->
           <div class="product-bulk-savings">
             <h4>Buy 4 Save 20% Off</h4>
-            <p>Purchase 4 or more units of this product and receive 20% off your order. Mix and match across different strengths.</p>
+            <p>Purchase 4 or more units of this product and receive 20% off your order.</p>
           </div>
 
           <!-- DESCRIPTION -->
           <div class="product-description">
             <h3>Description</h3>
             <p>KPV is an alpha-MSH derived tripeptide with high purity for controlled laboratory studies. Each batch independently tested and certified.</p>
+            <p><strong>Research Use Only:</strong> This product is intended solely for laboratory research. Not for human consumption or therapeutic use.</p>
           </div>
-
           <!-- SHARE -->
           <div class="product-share">
             <span>Share:</span>
@@ -195,11 +184,10 @@
   </section>
 
   <!-- RELATED PRODUCTS -->
-  <section class="related-products">
-    <div class="container">
+  <div class="container">
       <h2 class="related-title">Related Products</h2>
       <div class="products-grid">
-        <div class="product-card">
+      <div class="product-card">
           <div class="product-img-wrap">
             <span class="product-badge">Sale!</span>
             <a href="glp-3rt.html" class="product-link"></a>
@@ -218,12 +206,11 @@
               <a href="glp-3rt.html" class="product-name"><h3>GLP-3RT</h3></a>
             </div>
             <div class="product-info-right">
-              <span class="price"><span class="woocommerce-Price-amount">$54.99</span></span>
+              <span class="price"><span class="woocommerce-Price-amount">$65.99</span></span>
             </div>
           </div>
         </div>
-
-        <div class="product-card">
+      <div class="product-card">
           <div class="product-img-wrap">
             <span class="product-badge">Sale!</span>
             <a href="ghk-cu.html" class="product-link"></a>
@@ -242,16 +229,15 @@
               <a href="ghk-cu.html" class="product-name"><h3>GHK-CU</h3></a>
             </div>
             <div class="product-info-right">
-              <span class="price"><span class="woocommerce-Price-amount">$44.99</span></span>
+              <span class="price"><span class="woocommerce-Price-amount">$53.99</span></span>
             </div>
           </div>
         </div>
-
-        <div class="product-card">
+      <div class="product-card">
           <div class="product-img-wrap">
             <span class="product-badge">Sale!</span>
             <a href="glutathione.html" class="product-link"></a>
-            <img src="../../images/glutathione.png" alt="Glutathione" loading="lazy">
+            <img src="../../images/glutathione.png" alt="GLUTATHIONE" loading="lazy">
             <div class="product-hover-actions">
               <a href="#" class="hover-action-btn" aria-label="Add to wishlist"><i class="fa-regular fa-heart"></i></a>
               <a href="#" class="hover-action-btn" aria-label="Quick view"><i class="fa-solid fa-magnifying-glass"></i></a>
@@ -263,15 +249,14 @@
           <div class="product-info">
             <div class="product-info-left">
               <span class="product-cat">ALL PEPTIDES</span>
-              <a href="glutathione.html" class="product-name"><h3>Glutathione</h3></a>
+              <a href="glutathione.html" class="product-name"><h3>GLUTATHIONE</h3></a>
             </div>
             <div class="product-info-right">
-              <span class="price"><span class="woocommerce-Price-amount">$40.00</span></span>
+              <span class="price"><span class="woocommerce-Price-amount">$48.00</span></span>
             </div>
           </div>
         </div>
-
-        <div class="product-card">
+      <div class="product-card">
           <div class="product-img-wrap">
             <span class="product-badge">Sale!</span>
             <a href="mots-c.html" class="product-link"></a>
@@ -290,20 +275,19 @@
               <a href="mots-c.html" class="product-name"><h3>MOTS-C</h3></a>
             </div>
             <div class="product-info-right">
-              <span class="price"><span class="woocommerce-Price-amount">$54.99</span></span>
+              <span class="price"><span class="woocommerce-Price-amount">$65.99</span></span>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </section>
 
   <!-- CTA -->
   <section class="cta">
     <div class="container cta-inner">
       <h2>Advance Your Science Now</h2>
       <p>Discover our selection of verified, high-purity peptides developed for laboratory excellence.</p>
-      <a href="../../index.html#products" class="btn-cta">Shop Now</a>
+      <a href="../../index.html#products" class="btn-cta">Shop All Peptides</a>
     </div>
   </section>
 
@@ -313,13 +297,13 @@
       <div class="container footer-grid">
         <div class="footer-brand">
           <span class="footer-logo-text">Purity<span>Labs</span></span>
-          <p class="footer-desc">Ultra-pure amino acid derivatives and proteins manufactured for the research community. Thoroughly analyzed, certified >99% purity.</p>
+          <p class="footer-desc">Ultra-pure amino acid derivatives and proteins manufactured for the research community. Thoroughly analyzed, certified &gt;99% purity.</p>
           <a href="mailto:info@puritylabs.org" class="footer-email">info@puritylabs.org</a>
         </div>
         <div class="footer-links-col">
           <h4>QUICK LINKS</h4>
           <ul>
-            <li><a href="javascript:void(0)" class="footer-account-link" onclick="document.getElementById('accountOverlay').classList.add('open');document.getElementById('accountModal').classList.add('open');return false;">My Account</a></li>
+            <li><a href="../../account.html">My Account</a></li>
             <li><a href="../../cart.html">Shopping Cart</a></li>
           </ul>
         </div>
@@ -364,6 +348,10 @@ All products are sold for research, laboratory, or analytical purposes only, and
     </div>
   </footer>
 
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="../../pdb.js"></script>
   <script src="../../script.js"></script>
   <!-- ACCOUNT MODAL -->
   <div class="account-overlay" id="accountOverlay"></div>
@@ -383,7 +371,7 @@ All products are sold for research, laboratory, or analytical purposes only, and
         <input type="password" placeholder="Enter password" required>
       </div>
       <button type="submit" class="account-submit-btn">Sign In</button>
-      <p class="account-note">Demo only � data stored in your browser.</p>
+      <p class="account-note">Protected account — orders, cart &amp; profile synced securely via Firebase.</p>
     </form>
     <form class="account-form" id="registerForm" style="display:none;">
       <div class="account-field">
@@ -399,12 +387,13 @@ All products are sold for research, laboratory, or analytical purposes only, and
         <input type="password" placeholder="Create password" required>
       </div>
       <button type="submit" class="account-submit-btn">Create Account</button>
-      <p class="account-note">Demo only � data stored in your browser.</p>
+      <p class="account-note">Protected account — orders, cart &amp; profile synced securely via Firebase.</p>
     </form>
     <div class="account-logged-in" id="accountLoggedIn" style="display:none;">
       <div class="account-avatar"><i class="fa-solid fa-user"></i></div>
       <h3 id="accountName">User</h3>
       <p id="accountEmail">user@example.com</p>
+      <a href="../../account.html" class="account-dash-btn"><i class="fa-solid fa-gauge-high"></i> Go to My Dashboard</a>
       <button class="account-logout-btn" id="accountLogout">Sign Out</button>
     </div>
   </div>
