@@ -633,8 +633,8 @@ function openProductForm(id) {
         <div style="border:2px solid ${it.cur ? '#2E7D32' : '#dfe3e1'};border-radius:8px;padding:4px;background:#fff;height:92px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
           <img src="${esc(it.url)}" alt="" onerror="this.style.visibility='hidden'" style="max-width:100%;max-height:100%;object-fit:contain;">
         </div>
-        <div style="margin-top:6px;display:flex;justify-content:center;min-height:24px;">
-          ${it.cur ? '<span class="badge ok">Current</span>' : `<button class="btn btn-ghost btn-sm" data-pf-use="${i}">Use</button>`}
+        <div style="margin-top:6px;display:flex;justify-content:center;gap:4px;min-height:24px;">
+          ${it.cur ? '<span class="badge ok">Current</span>' : `<button class="btn btn-ghost btn-sm" data-pf-use="${i}">Use</button><button class="btn btn-ghost btn-sm" style="color:var(--danger,#c0392b);" data-pf-del="${i}" title="Delete from history"><i class="fa-solid fa-trash"></i></button>`}
         </div>
       </div>`).join('');
     $$('[data-pf-use]').forEach(b => b.addEventListener('click', () => {
@@ -645,6 +645,13 @@ function openProductForm(id) {
       imgHist.splice(imgHist.indexOf(piece), 1);
       curImage = piece;
       $('#pf-image').value = curImage;
+      pfRender();
+    }));
+    $$('[data-pf-del]').forEach(b => b.addEventListener('click', () => {
+      const idx = parseInt(b.dataset.pfDel);
+      const piece = imgHist[idx - 1];
+      if (idx === 0 || !piece) return;
+      imgHist.splice(imgHist.indexOf(piece), 1);
       pfRender();
     }));
   };
