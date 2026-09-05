@@ -523,121 +523,37 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// ===== ACCOUNT MODAL (Firebase Auth) =====
-let authListening = false;
+// ===== ACCOUNT (redirect to account.html dashboard) =====
+// The storefront no longer shows an inline sign-in modal. Clicking the
+// account button (or an action that requires auth) sends the user to the
+// standalone customer dashboard (account.html) where sign-in / sign-up and
+// the full order/wishlist/cart/profile management lives.
 
 function showAuthMsg(msg) {
-  const modal = document.getElementById('accountModal');
-  if (!modal) return;
-  let p = document.getElementById('accountAuthMsg');
-  if (!p) {
-    p = document.createElement('p');
-    p.id = 'accountAuthMsg';
-    p.style.cssText = 'color:#e33548;font-size:.8rem;margin:10px 0 0;text-align:center;display:none;';
-    const tabs = modal.querySelector('.account-tabs');
-    tabs?.after(p);
-  }
-  p.textContent = msg;
-  p.style.display = 'block';
-  setTimeout(() => { p.style.display = 'none'; }, 4200);
+  toast(msg);
+}
+
+function accountUrl() {
+  const inPages = /\/pages\//.test(window.location.pathname);
+  return (inPages ? '../' : './') + 'account.html';
+}
+
+function goAccount() {
+  window.location.href = accountUrl();
 }
 
 function openAccount() {
-  document.getElementById('accountOverlay')?.classList.add('open');
-  document.getElementById('accountModal')?.classList.add('open');
-  updateAuthUI();
+  goAccount();
 }
-function closeAccount() {
-  document.getElementById('accountOverlay')?.classList.remove('open');
-  document.getElementById('accountModal')?.classList.remove('open');
-}
+
 function updateAuthUI() {
-  const user = DB.user;
-  const loginForm = document.getElementById('loginForm');
-  const registerForm = document.getElementById('registerForm');
-  const loggedIn = document.getElementById('accountLoggedIn');
-  if (user) {
-    if (loginForm) loginForm.style.display = 'none';
-    if (registerForm) registerForm.style.display = 'none';
-    if (loggedIn) {
-      loggedIn.style.display = 'block';
-      const n = document.getElementById('accountName'); if (n) n.textContent = user.name || 'Researcher';
-      const et = document.getElementById('accountEmail'); if (et) et.textContent = user.email || '';
-    }
-  } else {
-    if (loginForm) { loginForm.style.display = 'block'; }
-    if (registerForm) registerForm.style.display = 'none';
-    if (loggedIn) loggedIn.style.display = 'none';
-  }
+  // Account state is handled on the account.html dashboard. Nothing to update here.
 }
-function checkLoggedIn() { updateAuthUI(); }
+
+function checkLoggedIn() { return !!DB.user; }
 
 document.addEventListener('click', (e) => {
-  if (e.target.closest('#accountBtn')) { openAccount(); return; }
-  if (e.target.closest('.account-close') || e.target.id === 'accountOverlay') { closeAccount(); return; }
-  if (e.target.closest('.account-tab')) {
-    document.querySelectorAll('.account-tab').forEach(t => t.classList.remove('active'));
-    e.target.closest('.account-tab').classList.add('active');
-    const tab = e.target.closest('.account-tab').dataset.tab;
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    if (loginForm) loginForm.style.display = tab === 'login' ? 'block' : 'none';
-    if (registerForm) registerForm.style.display = tab === 'register' ? 'block' : 'none';
-    if (document.getElementById('accountLoggedIn')) document.getElementById('accountLoggedIn').style.display = 'none';
-    return;
-  }
-  if (e.target.id === 'accountLogout') {
-    PDB.signOut().then(() => { updateAuthUI(); toast('Signed out. See you soon!'); });
-    return;
-  }
-});
-
-document.getElementById('loginForm')?.addEventListener('submit', function (e) {
-  e.preventDefault();
-  const email = this.querySelector('input[type="email"]').value.trim();
-  const pass = this.querySelector('input[type="password"]').value;
-  if (!email || !pass) { showAuthMsg('Enter your email and password.'); return; }
-  const btn = this.querySelector('button[type="submit"]');
-  const orig = btn.textContent;
-  btn.disabled = true; btn.textContent = 'Signing in…';
-  PDB.signIn(email, pass).then(() => {
-    closeAccount();
-    toast('Welcome back! You are signed in.');
-  }).catch((err) => {
-    showAuthMsg(PDB.authMsg(err));
-  }).then(() => {
-    btn.disabled = false; btn.textContent = orig;
-  });
-});
-
-document.getElementById('registerForm')?.addEventListener('submit', function (e) {
-  e.preventDefault();
-  const name = this.querySelector('input[type="text"]').value.trim();
-  const email = this.querySelector('input[type="email"]').value.trim();
-  const pass = this.querySelector('input[type="password"]').value;
-  if (!name || !email || !pass) { showAuthMsg('Please fill in all fields.'); return; }
-  const btn = this.querySelector('button[type="submit"]');
-  const orig = btn.textContent;
-  btn.disabled = true; btn.textContent = 'Creating account…';
-  PDB.signUp(email, pass)
-    .then((user) => PDB.setDoc('users', user.uid, {
-      name: name,
-      email: email,
-      role: 'customer',
-      joined: new Date().toISOString(),
-      created: PDB.ts()
-    }, { merge: false }))
-    .then(() => {
-      closeAccount();
-      toast('Account created. Welcome, ' + name + '!');
-      if (window.PurityMail) PurityMail.sendWelcome(name, email);
-    })
-    .catch((err) => {
-      showAuthMsg(PDB.authMsg(err));
-    })
-    .then(() => {
-      btn.disabled = false; btn.textContent = orig;
-    });
+  if (e.target.closest('#accountBtn')) { e.preventDefault(); goAccount(); return; }
 });
 
 // ===== FIREBASE LISTENERS =====
@@ -882,7 +798,7 @@ function saveOrder() {
     id: 'ORD-' + Date.now().toString(36).toUpperCase(),
     customerId: DB.user ? DB.user.uid : 'guest',
     customer: (DB.user && DB.user.name) || name.trim() || 'Guest Customer',
-    email: (DB.user && DB.user.email) || email,
+    email: (email || (DB.user && DB.user.email) || '').trim(),
     date: new Date().toISOString(),
     items: cart.map(it => ({ name: it.name, variation: it.variation || '', qty: it.qty, price: it.price || 0 })),
     subtotal,

@@ -28,7 +28,7 @@ const BRAND = {
 /* ------------------------------------------------------------------ */
 
 function publicUrl() {
-  return (process.env.PUBLIC_URL || process.env.RENDER_EXTERNAL_URL || '').replace(/\/+$/, '');
+  return (process.env.PUBLIC_URL || 'https://puritylabs.com').replace(/\/+$/, '');
 }
 
 function money(n) {
@@ -218,7 +218,7 @@ function stripTags(html) {
 
 function welcomeHTML(ctx) {
   const firstName = String(ctx.name || 'there').trim().split(/\s+/)[0];
-  const url = publicUrl() || 'https://puritylabs.onrender.com';
+  const url = publicUrl();
   const subject = 'Welcome to ' + ctx.siteName + ' — your account is ready';
 
   const body = `
@@ -350,7 +350,7 @@ function addressBlockHTML(title, order) {
 }
 
 function orderConfirmationHTML(order, ctx) {
-  const url = publicUrl() || 'https://puritylabs.onrender.com';
+  const url = publicUrl();
   const subject = ctx.siteName + ' — Order ' + order.id + ' confirmed';
   const firstName = String(order.customer || 'there').trim().split(/\s+/)[0];
 
