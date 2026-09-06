@@ -919,7 +919,7 @@ function initLiveStorefront() {
   ].map(([marker, fn]) => ({ el: findGridByMarker(marker), fn })).filter(g => g.el);
   if (!grids.length) return;
 
-  PDB.watchCol('products', (list) => {
+  PDB.getColCached('products', (list) => {
     const prods = (list || []).filter(p => p.status !== 'hidden' && p.slug);
     const empty = '<p style="text-align:center;color:#6b7280;padding:40px 0;">The catalog is being prepared — check back soon.</p>';
     grids.forEach(g => {
@@ -998,7 +998,7 @@ function initLiveProduct() {
       if (!rel.length) {
         if (relSection) relSection.style.display = 'none';
       } else {
-        PDB.getCol('products').then(list => {
+        PDB.getColCached('products').then(list => {
           const map = (list || []).filter(x => x.status !== 'hidden' && x.slug);
           const cards = rel.map(s => map.find(x => x.slug === s)).filter(Boolean).map(cardHTML);
           if (cards.length) {
@@ -1060,7 +1060,7 @@ function initLiveCOAs() {
       </div>`).join('');
   };
   if (search) search.addEventListener('input', (e) => { term = e.target.value.toLowerCase().trim(); draw(); });
-  PDB.watchCol('products', (list2) => { products = list2 || []; draw(); });
+  PDB.getColCached('products', (list2) => { products = list2 || []; draw(); });
 }
 
 // ===== COA LIGHTBOX =====

@@ -33,6 +33,69 @@ window.PDB = (function () {
   var db = null;
   var auth = null;
 
+  /* ---------------- local cache (IndexedDB) ----------------
+     Products and other rarely-changing collections are cached locally so the
+     grid renders instantly on repeat visits instead of waiting on the network
+     round-trip. The network still runs in the background and refreshes/overwrites
+     the cache, so data stays live without the blank-grid wait.
+  */
+  var CACHE_DB = 'pl_cache';
+  var CACHE_VERSION = 1;
+  var STORE = 'kv';
+  var MAX_AGE = 24 * 60 * 60 * 1000; // 24h freshness for reads; writes always overwrite
+
+  var _idb = null;
+  function idb() {
+    if (_idb) return Promise.resolve(_idb);
+    if (typeof indexedDB === 'undefined') return Promise.resolve(null);
+    return new Promise(function (resolve) {
+      var req = indexedDB.open(CACHE_DB, CACHE_VERSION);
+      req.onupgradeneeded = function (e) {
+        var d = e.target.result;
+        if (!d.objectStoreNames.contains(STORE)) d.createObjectStore(STORE);
+      };
+      req.onsuccess = function (e) { _idb = e.target.result; resolve(_idb); };
+      req.onerror = function () { resolve(null); };
+    });
+  }
+
+  function cacheSet(key, data) {
+    idb().then(function (d) {
+      if (!d) return;
+      try {
+        var tx = d.transaction(STORE, 'readwrite');
+        tx.objectStore(STORE).put({ key: key, data: data, ts: Date.now() });
+      } catch (e) { /* ignore */ }
+    });
+  }
+
+  function cacheGet(key, maxAge) {
+    return idb().then(function (d) {
+      if (!d) return null;
+      return new Promise(function (resolve) {
+        var tx = d.transaction(STORE, 'readonly');
+        var req = tx.objectStore(STORE).get(key);
+        req.onsuccess = function () {
+          var row = req.result;
+          if (!row) return resolve(null);
+          if (maxAge && (Date.now() - row.ts) > maxAge) return resolve(null);
+          resolve(row.data);
+        };
+        req.onerror = function () { resolve(null); };
+      });
+    });
+  }
+
+  function cacheClear() {
+    return idb().then(function (d) {
+      if (!d) return;
+      try {
+        var tx = d.transaction(STORE, 'readwrite');
+        tx.objectStore(STORE).clear();
+      } catch (e) { /* ignore */ }
+    });
+  }
+
   function init() {
     if (typeof firebase === 'undefined') return;
     try {
@@ -73,6 +136,57 @@ window.PDB = (function () {
     return query.get().then(function (snap) {
       return snap.docs.map(function (d) { return pick(d.data(), d.id); });
     });
+  }
+
+  /* Get a collection, using the local cache if present. First `then` resolves
+     with the cached copy (may be null on first visit / expired); the Promise
+     resolves to the full result array once the *network* fetch completes and
+     the cache has been refreshed. Consumers that render immediately from the
+     cache then re-render on the network result get instant repeat loads. */
+  function cacheKeyFor(col) { return 'col:' + col; }
+  function cacheKeyForQuery(q) {
+    try {
+      return 'q:' + q.path + ':' + (q._query ? JSON.stringify(q._query) : '') + ':' + JSON.stringify(q._queryOptions || '');
+    } catch (e) { return 'q:' + String(q); }
+  }
+
+  function getColCached(col, cb, maxAge) {
+    if (!ready) return noDb();
+    var key = cacheKeyFor(col);
+    var age = (maxAge === undefined ? MAX_AGE : maxAge);
+    var live = false;
+    var pending = db.collection(col).get().then(function (snap) {
+      var data = snap.docs.map(function (d) { return pick(d.data(), d.id); });
+      live = true;
+      cacheSet(key, data);
+      if (cb) cb(data);
+      return data;
+    });
+    cacheGet(key, age).then(function (cached) {
+      // Only paint the cached copy if a live (network) result hasn't already
+      // arrived — never let stale data overwrite a fresher response.
+      if (cached && !live && cb) cb(cached);
+    });
+    return pending;
+  }
+
+  function getQueryCached(query, cb, maxAge) {
+    if (!ready) return noDb();
+    if (!query) return Promise.resolve([]);
+    var key = cacheKeyForQuery(query);
+    var age = (maxAge === undefined ? MAX_AGE : maxAge);
+    var live = false;
+    var pending = query.get().then(function (snap) {
+      var data = snap.docs.map(function (d) { return pick(d.data(), d.id); });
+      live = true;
+      cacheSet(key, data);
+      if (cb) cb(data);
+      return data;
+    });
+    cacheGet(key, age).then(function (cached) {
+      if (cached && !live && cb) cb(cached);
+    });
+    return pending;
   }
 
   /* ---------------- writes ---------------- */
@@ -190,6 +304,9 @@ window.PDB = (function () {
     getDoc: getDoc,
     getCol: getCol,
     getQuery: getQuery,
+    getColCached: getColCached,
+    getQueryCached: getQueryCached,
+    cacheClear: cacheClear,
     q: q,
     setDoc: setDoc,
     addDoc: addDoc,
