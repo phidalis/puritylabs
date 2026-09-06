@@ -130,7 +130,7 @@
               </span>
               <i class="fa-solid fa-arrow-right"></i>
             </a>
-            <a class="contact-channel email" href="mailto:info@puritylabs.org">
+            <a class="contact-channel email" href="mailto:info@puritylabs.org" id="emLink">
               <span class="contact-channel-icon"><i class="fa-solid fa-envelope"></i></span>
               <span class="contact-channel-text">
                 <b>Email</b>
@@ -263,12 +263,20 @@ All products are sold for research, laboratory, or analytical purposes only, and
       return { processing: 'progress', completed: 'ok', shipped: 'progress', pending: 'warn', refunded: 'danger', cancelled: 'neutral' }[s || 'processing'] || 'neutral';
     }
 
-    // WhatsApp number is configurable via Firestore settings.whatsapp (admin
-    // cannot see it today) and falls back to this default. Digits only.
-    function initWhatsApp() {
-      const wa = (typeof DB !== 'undefined' && DB.settings && DB.settings.whatsapp) || '15551234567';
-      const link = document.getElementById('waLink');
-      if (link) link.href = 'https://wa.me/' + String(wa).replace(/[^\d]/g, '');
+    // WhatsApp + email are configurable via Firestore settings (admin → Settings
+    // → Contact) and fall back to sensible defaults. WhatsApp digits only.
+    function initContact() {
+      const s = (typeof DB !== 'undefined' && DB.settings) || {};
+      const wa = s.whatsapp || '15551234567';
+      const email = s.contactEmail || 'info@puritylabs.org';
+      const waLink = document.getElementById('waLink');
+      if (waLink) waLink.href = 'https://wa.me/' + String(wa).replace(/[^\d]/g, '');
+      const emLink = document.getElementById('emLink');
+      if (emLink) {
+        emLink.href = 'mailto:' + email;
+        const emTxt = emLink.querySelector('.contact-channel-text span');
+        if (emTxt) emTxt.textContent = email;
+      }
     }
 
     function trackTimelineHTML(t) {
@@ -337,7 +345,7 @@ All products are sold for research, laboratory, or analytical purposes only, and
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-      initWhatsApp();
+      initContact();
       var btn = document.getElementById('trackBtn');
       var input = document.getElementById('trackCode');
       if (btn) btn.addEventListener('click', trackOrder);

@@ -118,6 +118,7 @@ function catalogData() {
     currency: 'USD $', freeShipThreshold: 250, flatRate: 9.99, taxRate: 0,
     lowStockAlert: 10, ordersPerPage: 10, emailFrom: 'no-reply@puritylabs.com',
     adminNotifyEmails: '', storeAddress: '', contactEmail: 'info@puritylabs.org',
+    whatsapp: '15551234567',
     emailFooterNote: 'For in-vitro research and laboratory use only. Not for human consumption.',
     returnsPolicy: 'Returns accepted within 14 days of delivery for unopened, sealed products. Contact support for an RMA number.',
     terms: 'Research use only. Products are not intended for human consumption.'
@@ -130,7 +131,7 @@ function initDB() {
   DB = {
     products: cat.products,
     cats: cat.cats,
-    orders: [], coupons: [], visits: [], media: [], news: [],
+    orders: [], coupons: [], visits: [], media: [], news: [], tracking: [],
     users: [],
     nav: cat.nav,
     content: cat.content,
@@ -162,6 +163,7 @@ function firestoreLoad() {
   watch('media', v => { DB.media = v; });
   watch('users', v => { DB.users = v; });
   watch('visits', v => { DB.visits = v; sliceSortVisits(); });
+  watch('tracking', v => { DB.tracking = v; });
   watch('content', v => { if (v && v.length) DB.content = Object.assign({}, DB.content, v[0]); });
   watch('settings', v => { if (v && v.length) DB.settings = Object.assign({}, DB.settings, v[0]); });
 }
@@ -1561,6 +1563,7 @@ function renderSettings() {
 <div class="tabs">
       <button class="tab-btn active" data-stab="general">General</button>
       <button class="tab-btn" data-stab="emails">Emails</button>
+      <button class="tab-btn" data-stab="contact">Contact</button>
       <button class="tab-btn" data-stab="shipping">Shipping &amp; tax</button>
       <button class="tab-btn" data-stab="source">Source of truth</button>
       <button class="tab-btn" data-stab="backup">Backup &amp; Restore</button>
@@ -1603,6 +1606,18 @@ function settingsHTML(tab, s) {
           <div class="form-field" style="grid-column:1 / -1;"><label>Email footer note</label><textarea id="st-footernote" rows="2" placeholder="For in-vitro research and laboratory use only. Not for human consumption.">${esc(s.emailFooterNote)}</textarea></div>
         </div>
         <div style="margin-top:8px;"><button class="btn btn-primary" data-save-emails><i class="fa-solid fa-envelope"></i> Save email settings</button></div>
+      </div>`;
+  }
+  if (tab === 'contact') {
+    return `
+      <div class="card" style="max-width:720px;">
+        <div class="card-head"><div><h3>Contact section</h3><p>Shown on the Contact &amp; Order Tracking page</p></div></div>
+        <div class="form-grid">
+          <div class="form-field"><label>WhatsApp number</label><input id="st-whatsapp" value="${esc(s.whatsapp)}" placeholder="15551234567"></div>
+          <div class="form-field"><label>Support / contact email</label><input id="st-contactmail" value="${esc(s.contactEmail)}" placeholder="info@puritylabs.org"></div>
+        </div>
+        <p style="font-size:.8rem;color:var(--muted);margin:-4px 0 14px;">The WhatsApp button opens wa.me with this number (digits only are fine) and the email button opens this address. Also used as the order emails footer contact.</p>
+        <div style="margin-top:8px;"><button class="btn btn-primary" data-save-contact><i class="fa-solid fa-cloud-arrow-up"></i> Save contact settings</button></div>
       </div>`;
   }
   if (tab === 'shipping') {
@@ -1696,6 +1711,12 @@ function bindSettings(tab, s) {
       s.emailFooterNote = $('#st-footernote').value.trim();
       persistAll(); toast('Email settings saved.');
     });
+  } else if (tab === 'contact') {
+    $('#settingsView [data-save-contact]')?.addEventListener('click', () => {
+      s.whatsapp = $('#st-whatsapp').value.trim();
+      s.contactEmail = $('#st-contactmail').value.trim();
+      persistAll(); toast('Contact settings saved.');
+    });
   } else if (tab === 'shipping') {
     $('#settingsView [data-save-ship]')?.addEventListener('click', () => {
       s.freeShipThreshold = +$('#st-shipthr').value || 0; s.flatRate = +$('#st-shiprate').value || 0; s.taxRate = +$('#st-tax').value || 0;
@@ -1747,8 +1768,8 @@ function bindSettings(tab, s) {
     });
   } else {
     $('#settingsView [data-reset-all]')?.addEventListener('click', () => {
-      askConfirm('Clear transactional data?', 'Orders, coupons, visits, media and newsletter subscribers are deleted from Firestore. Products, categories, navigation, content and settings are kept untouched.', () => {
-        wipeCols(['orders', 'coupons', 'visits', 'media', 'newsletter']);
+      askConfirm('Clear transactional data?', 'Orders, tracking, coupons, visits, media and newsletter subscribers are deleted from Firestore. Products, categories, navigation, content and settings are kept untouched.', () => {
+        wipeCols(['orders', 'tracking', 'coupons', 'visits', 'media', 'newsletter']);
         toast('Transactional data cleared — catalog untouched.');
       });
     });
@@ -1770,7 +1791,7 @@ function wipeCols(cols) {
 }
 
 /* ---------------- backup & restore ---------------- */
-const BACKUP_COLS = ['products', 'categories', 'orders', 'coupons', 'nav', 'media', 'users', 'visits', 'newsletter', 'content', 'settings'];
+const BACKUP_COLS = ['products', 'categories', 'orders', 'tracking', 'coupons', 'nav', 'media', 'users', 'visits', 'newsletter', 'content', 'settings'];
 
 function exportBackup() {
   if (!PDB.ready || !PDB.db) { toast('Firestore is not connected yet — try again in a moment.', 'error'); return; }
