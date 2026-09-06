@@ -1,21 +1,18 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
-  <meta name="description" content="Shopping Cart — Purity Labs research peptides.">
-  <title>Shopping Cart – Purity Labs</title>
+  <meta name="description" content="Contact Purity Labs — chat on WhatsApp, email support, or track your order using your order code.">
+  <title>Contact &amp; Order Tracking – Purity Labs</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
-
 </head>
 <body>
-
-  
 
   <!-- TOP BAR -->
   <div class="top-bar">
@@ -103,92 +100,82 @@
   </div>
 
   <!-- BREADCRUMBS -->
-  <div class="cart-breadcrumb">
+  <div class="checkout-breadcrumb">
     <div class="container">
       <a href="index.html">Home</a>
       <span class="sep">/</span>
-      <span>Shopping Cart</span>
+      <span>Contact</span>
     </div>
   </div>
 
-  <!-- CART CONTENT -->
-  <section class="cart-page">
+  <!-- CONTACT CONTENT -->
+  <section class="contact-page">
     <div class="container">
 
-      <!-- Empty Cart Message (hidden when items exist) -->
-      <div class="cart-empty" id="cartEmpty" style="display:none;">
-        <div class="cart-empty-icon">
-          <i class="fa-solid fa-bag-shopping"></i>
-        </div>
-        <h2>Your cart is currently empty</h2>
-        <p>Looks like you haven't added any products yet.</p>
-        <a href="index.html" class="btn-continue-shopping">
-          <i class="fa-solid fa-arrow-left"></i> Continue Shopping
-        </a>
+      <div class="contact-intro">
+        <h1>Contact &amp; Order Tracking</h1>
+        <p>Questions about an order, a product, or your account? Reach us on WhatsApp or email — or track any order right here using its order code from your confirmation or dashboard.</p>
       </div>
 
-      <!-- Cart With Items -->
-      <div id="cartContent" style="display:none;">
-        <h1 class="cart-page-title">Shopping Cart</h1>
-        <div class="cart-layout">
+      <div class="contact-grid">
 
-          <!-- LEFT: Cart Table -->
-          <div>
-            <div class="cart-table-wrap">
-              <table class="cart-table">
-                <thead>
-                  <tr>
-                    <th>Product</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Total</th>
-                    <th style="text-align:center;">Remove</th>
-                  </tr>
-                </thead>
-                <tbody id="cartTableBody">
-                  <!-- Populated by JS -->
-                </tbody>
-              </table>
-            </div>
-            <a href="index.html" class="cart-continue-link">
-              <i class="fa-solid fa-arrow-left"></i> Continue Shopping
+        <!-- LEFT: channels -->
+        <div>
+          <div class="contact-channels">
+            <a class="contact-channel wa" href="#" id="waLink" target="_blank" rel="noopener">
+              <span class="contact-channel-icon"><i class="fa-brands fa-whatsapp"></i></span>
+              <span class="contact-channel-text">
+                <b>WhatsApp</b>
+                <span>Chat with our client care team</span>
+              </span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </a>
+            <a class="contact-channel email" href="mailto:info@puritylabs.org">
+              <span class="contact-channel-icon"><i class="fa-solid fa-envelope"></i></span>
+              <span class="contact-channel-text">
+                <b>Email</b>
+                <span>info@puritylabs.org</span>
+              </span>
+              <i class="fa-solid fa-arrow-right"></i>
             </a>
           </div>
 
-          <!-- RIGHT: Order Summary -->
-          <div class="cart-summary">
-            <h2 class="cart-summary-title">Order Summary</h2>
-            <div class="cart-summary-row">
-              <span class="label">Subtotal</span>
-              <span class="value" id="summarySubtotal">$0.00</span>
-            </div>
-            <div class="cart-summary-row shipping">
-              <span class="label">Shipping</span>
-              <span class="value" id="summaryShipping">Calculated at checkout</span>
-            </div>
-            <div class="cart-summary-divider"></div>
-            <div class="cart-summary-total">
-              <span>Total</span>
-              <span id="summaryTotal">$0.00</span>
-            </div>
-
-            <!-- Promo Code -->
-            <div class="cart-promo">
-              <button class="cart-promo-toggle" id="promoToggle">
-                <i class="fa-solid fa-tag"></i> Have a promo code?
-              </button>
-              <div class="cart-promo-form" id="promoForm">
-                <input type="text" class="cart-promo-input" placeholder="Enter code" id="promoInput">
-                <button class="cart-promo-apply" id="promoApply">Apply</button>
-              </div>
-            </div>
-
-            <a href="checkout.html" class="btn-checkout">Proceed to Checkout</a>
+          <div class="contact-faq">
+            <h3>Frequently Asked Questions</h3>
+            <details class="faq-item" open>
+              <summary>Are your products for human use?</summary>
+              <p>No. All products are sold for research, laboratory or analytical purposes only and are not for human consumption.</p>
+            </details>
+            <details class="faq-item">
+              <summary>How long does shipping take?</summary>
+              <p>Orders over $250 ship free in 5–7 business days. Flat-rate shipping ($9.99) arrives in 3–5 business days.</p>
+            </details>
+            <details class="faq-item">
+              <summary>How do I check my order status?</summary>
+              <p>Enter your order code (e.g. ORD-XXXX) in the tracking box to see live progress and any updates from our team. Signed in? Your dashboard has a full Order Tracking section.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Do you offer bulk or university discounts?</summary>
+              <p>Yes — quantity discounts apply automatically (20% off when you buy 4+ of any product). For institutional pricing, message us on WhatsApp or email.</p>
+            </details>
           </div>
-
         </div>
-      </div>
 
+        <!-- RIGHT: tracking widget -->
+        <div>
+          <div class="tracking-widget">
+            <h3>Track Your Order</h3>
+            <p class="tracking-hint">Enter the order code from your order confirmation or dashboard.</p>
+            <div class="tracking-form">
+              <input type="text" id="trackCode" placeholder="e.g. ORD-XXXX" autocomplete="off" spellcheck="false">
+              <button type="button" id="trackBtn">Track</button>
+            </div>
+            <div class="tracking-msg" id="trackMsg"></div>
+            <div class="tracking-result" id="trackResult"></div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </section>
 
@@ -206,6 +193,7 @@
           <ul>
             <li><a href="account.html">My Account</a></li>
             <li><a href="cart.html">Shopping Cart</a></li>
+            <li><a href="contact.html">Contact &amp; Order Tracking</a></li>
           </ul>
         </div>
         <div class="footer-links-col">
@@ -245,7 +233,7 @@
         <p class="disclaimer-title">FDA DISCLAIMER</p>
         <p>The statements on this website have not been evaluated by the U.S. Food and Drug Administration. The products and information provided by Purity Labs are not intended to diagnose, treat, cure, or prevent any disease.
 Purity Labs LLC is a research chemical supplier. We are not a
- compounding pharmacy or compounding facility as defined under Section 503A of the Federal Food, Drug, and Cosmetic Act, nor are we an outsourcing facility as defined under Section 503B.
+compounding pharmacy or compounding facility as defined under Section 503A of the Federal Food, Drug, and Cosmetic Act, nor are we an outsourcing facility as defined under Section 503B.
 All products are sold for research, laboratory, or analytical purposes only, and are not for human consumption</p>
       </div>
     </div>
@@ -257,21 +245,103 @@ All products are sold for research, laboratory, or analytical purposes only, and
   <script src="pdb.js"></script>
   <script src="script.js"></script>
   <script>
-    // ===== CART PAGE LOGIC =====
-    // Cart rendering, quantity and removal are handled by script.js
-    // (renderCartPage) — this file keeps the promo-code stub only.
+    /* ===== CONTACT + ORDER TRACKING ===== */
 
-    // Promo toggle
-    document.getElementById('promoToggle').addEventListener('click', () => {
-      document.getElementById('promoForm').classList.toggle('open');
-    });
+    function usd(n) { return '$' + (+n || 0).toFixed(2); }
 
-    document.getElementById('promoApply').addEventListener('click', () => {
-      const code = document.getElementById('promoInput').value.trim();
-      if (code) {
-        alert('Promo code "' + code + '" is not valid.');
-        document.getElementById('promoInput').value = '';
+    function escText(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function fmtDate(iso) {
+      try { return new Date(iso).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }); } catch (err) { return '—'; }
+    }
+
+    function statusTone(s) {
+      return { processing: 'progress', completed: 'ok', shipped: 'progress', pending: 'warn', refunded: 'danger', cancelled: 'neutral' }[s || 'processing'] || 'neutral';
+    }
+
+    // WhatsApp number is configurable via Firestore settings.whatsapp (admin
+    // cannot see it today) and falls back to this default. Digits only.
+    function initWhatsApp() {
+      const wa = (typeof DB !== 'undefined' && DB.settings && DB.settings.whatsapp) || '15551234567';
+      const link = document.getElementById('waLink');
+      if (link) link.href = 'https://wa.me/' + String(wa).replace(/[^\d]/g, '');
+    }
+
+    function trackTimelineHTML(t) {
+      const steps = (t.tracking || []).slice();
+      const current = steps.length ? steps[steps.length - 1] : { status: t.status || 'processing' };
+      const tone = statusTone(current.status);
+      let html = '<div class="track-head">' +
+        '<span class="badge badge-' + tone + '">' + escText(current.status) + '</span>' +
+        '<span class="track-code">' + escText(t.orderId) + '</span></div>';
+      if (t.items && t.items.length) {
+        html += '<div class="track-items">' + t.items.map(it =>
+          '<div class="track-item"><span>' + escText(it.name) + (it.variation ? ' (' + escText(it.variation) + ')' : '') + ' ×' + it.qty + '</span><b>' + usd((it.price || 0) * (it.qty || 1)) + '</b></div>'
+        ).join('') + '</div>';
+        html += '<div class="track-total">Order total <b>' + usd(t.total) + '</b></div>';
       }
+      html += '<div class="track-steps">';
+      const all = ['processing', 'shipped', 'completed'];
+      const idx = all.indexOf(current.status);
+      all.forEach((s, i) => {
+        const done = idx > i;
+        const isNow = i === idx && steps.length > 0;
+        html += '<div class="track-step ' + (done ? 'done' : '') + (isNow ? ' now' : '') + '">' +
+          '<span class="track-step-dot"><i class="fa-solid ' + (done ? 'fa-check' : isNow ? 'fa-circle' : '') + '"></i></span>' +
+          '<span class="track-step-label">' + s.charAt(0).toUpperCase() + s.slice(1) + '</span></div>';
+      });
+      html += '</div>';
+      if (steps.length) {
+        html += '<div class="track-log"><div class="track-log-title">Updates</div>';
+        steps.slice().reverse().forEach(step => {
+          const isLast = steps[steps.length - 1] === step;
+          html += '<div class="track-log-item">' +
+            '<div class="track-log-head"><span class="badge badge-' + statusTone(step.status) + '">' + escText(step.status) + '</span>' +
+            '<span class="track-log-date">' + fmtDate(step.at) + '</span></div>' +
+            (step.message ? '<p class="track-log-msg">' + escText(step.message) + '</p>' : '') +
+            '</div>';
+        });
+        html += '</div>';
+      }
+      return html;
+    }
+
+    function trackOrder() {
+      const input = document.getElementById('trackCode');
+      const msg = document.getElementById('trackMsg');
+      const result = document.getElementById('trackResult');
+      const code = (input ? input.value : '').trim().toUpperCase();
+      if (!code) { msg.className = 'tracking-msg error'; msg.textContent = 'Enter your order code first.'; return; }
+      msg.className = 'tracking-msg';
+      msg.textContent = 'Checking…';
+      result.innerHTML = '';
+      PDB.getDoc('tracking', code)
+        .then(function (t) {
+          if (!t || !t.orderId) {
+            msg.className = 'tracking-msg error';
+            msg.textContent = 'No order found for that code. Double-check your order number.';
+            return;
+          }
+          msg.className = 'tracking-msg ok';
+          msg.textContent = 'Found your order — here is its current progress.';
+          result.innerHTML = trackTimelineHTML(t);
+        })
+        .catch(function () {
+          msg.className = 'tracking-msg error';
+          msg.textContent = 'Could not check the order right now. Please try again in a moment.';
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      initWhatsApp();
+      var btn = document.getElementById('trackBtn');
+      var input = document.getElementById('trackCode');
+      if (btn) btn.addEventListener('click', trackOrder);
+      if (input) input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); trackOrder(); } });
     });
   </script>
 <!-- SIDE CART DRAWER -->

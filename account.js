@@ -181,6 +181,7 @@ function renderDash() {
 
   renderRecent(orders);
   renderOrders(orders);
+  renderTracking(orders);
   renderWishlist(wish);
   renderCart(cart);
 }
@@ -236,6 +237,46 @@ function renderOrders(orders) {
       if (detail) { detail.classList.toggle('open'); chev.style.transform = detail.classList.contains('open') ? 'rotate(180deg)' : ''; }
     });
   });
+}
+
+/* ---------- order tracking ---------- */
+function renderTracking(orders) {
+  const el = $('#trackingList');
+  if (!orders.length) {
+    el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-truck-fast"></i><p>No orders to track yet. Place your first order to see live status here.</p></div>';
+    return;
+  }
+  const steps = ['processing', 'shipped', 'completed'];
+  const html = orders.map(o => {
+    const hist = (o.tracking && o.tracking.length ? o.tracking : [{ status: o.status || 'processing', message: '', at: o.date }]);
+    const cur = hist[hist.length - 1];
+    const idx = steps.indexOf(cur.status || 'processing');
+    let body = '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">' +
+      '<div style="flex:1;min-width:180px;"><b style="font-size:.95rem;">' + esc(o.id) + '</b>' +
+      '<div style="font-size:.8rem;color:var(--muted);">Placed ' + fmtDate(o.date) + '</div></div>' +
+      '<div>' + badgeFor(cur.status) + '</div>' +
+      '<div style="text-align:right;"><b>' + money(orderTotal(o)) + '</b></div></div>';
+    body += '<div style="display:flex;align-items:flex-start;margin:16px 0 14px;">' +
+      steps.map((s, i) => {
+        const active = idx >= i, done = idx > i;
+        return '<div style="flex:1;text-align:center;position:relative;">' +
+          (i < steps.length - 1 ? '<div style="position:absolute;top:10px;left:calc(50% + 12px);right:calc(-50% + 12px);height:2px;background:' + (done ? 'var(--green)' : 'var(--line)') + ';"></div>' : '') +
+          '<div style="width:22px;height:22px;border-radius:50%;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:.55rem;border:2px solid ' + (idx > i ? 'var(--green)' : 'var(--line)') + ';background:' + (idx > i ? 'var(--green)' : '#fff') + ';color:#fff;">' +
+          (idx > i ? '<i class="fa-solid fa-check"></i>' : (idx === i ? '<span style="display:block;width:8px;height:8px;border-radius:50%;background:var(--green);"></span>' : '')) + '</div>' +
+          '<div style="font-size:.72rem;font-weight:600;color:' + (active ? 'var(--green)' : 'var(--muted)') + ';">' + s.charAt(0).toUpperCase() + s.slice(1) + '</div></div>';
+      }).join('') + '</div>';
+    const updates = hist.slice().reverse();
+    body += '<div style="border:1px solid var(--line);border-radius:10px;background:#fff;padding:12px 14px;">' +
+      '<div style="font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Updates</div>' +
+      (updates.length ? updates.map(st => '<div style="border-left:2px solid var(--green);padding:0 0 12px 12px;position:relative;">' +
+        '<div style="position:absolute;left:-5px;top:4px;width:8px;height:8px;border-radius:50%;background:var(--green);"></div>' +
+        '<div style="display:flex;align-items:center;gap:10px;">' + badgeFor(st.status) +
+        '<span style="font-size:.74rem;color:var(--muted);">' + fmtDate(st.at) + '</span></div>' +
+        (st.message ? '<div style="font-size:.84rem;color:var(--ink);margin-top:3px;">' + esc(st.message) + '</div>' : '') + '</div>').join('')
+        : '<div style="font-size:.84rem;color:var(--muted);">No status updates yet.</div>') + '</div>';
+    return '<div class="track-card">' + body + '</div>';
+  }).join('');
+  el.innerHTML = html;
 }
 
 function cartKeyOf(it) {

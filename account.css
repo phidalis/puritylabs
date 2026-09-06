@@ -199,6 +199,12 @@ ul { list-style: none; }
 .item-meta { font-size: .8rem; color: var(--muted); }
 .item-price { font-weight: 700; color: var(--green); }
 
+/* ---------- ORDER TRACKING ---------- */
+.track-card {
+  border: 1px solid var(--line); border-radius: 12px; background: #fafcfb;
+  padding: 18px; margin-bottom: 14px;
+}
+
 /* ---------- FOOTER ---------- */
 .site-footer { background: #0c150f; color: #e8efe9; padding: 48px 0 24px; margin-top: 20px; }
 .footer-inner { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 36px; }

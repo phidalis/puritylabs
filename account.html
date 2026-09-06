@@ -25,6 +25,7 @@
         <a href="pages/nasal-sprays.html" class="nav-link">Nasal Sprays</a>
         <a href="pages/coas.html" class="nav-link">COAs</a>
         <a href="pages/about.html" class="nav-link">About Us</a>
+        <a href="contact.html" class="nav-link">Contact</a>
       </nav>
       <div class="header-actions">
         <a href="cart.html" class="icon-btn cart-btn" aria-label="Cart">
@@ -111,6 +112,7 @@
         <aside class="dash-side">
           <button class="dash-tab active" data-panel="overview"><i class="fa-solid fa-gauge-high"></i> Overview</button>
           <button class="dash-tab" data-panel="orders"><i class="fa-solid fa-receipt"></i> Orders <span class="dash-count" id="ordersCount">0</span></button>
+          <button class="dash-tab" data-panel="tracking"><i class="fa-solid fa-truck-fast"></i> Order Tracking</button>
           <button class="dash-tab" data-panel="wishlist"><i class="fa-solid fa-heart"></i> Wishlist <span class="dash-count" id="wishCount">0</span></button>
           <button class="dash-tab" data-panel="cart"><i class="fa-solid fa-bag-shopping"></i> Cart <span class="dash-count" id="dashCartCount">0</span></button>
           <button class="dash-tab" data-panel="profile"><i class="fa-solid fa-user-cog"></i> Profile</button>
@@ -145,6 +147,15 @@
             <div class="dash-card">
               <div class="dash-card-head"><h3>Order History</h3></div>
               <div id="ordersList"></div>
+            </div>
+          </div>
+
+          <!-- ORDER TRACKING -->
+          <div class="dash-panel" id="panel-tracking">
+            <div class="dash-card">
+              <div class="dash-card-head"><h3>Order Tracking</h3></div>
+              <p class="auth-sub" style="margin-bottom:18px;">Live status and updates for every order on this account.</p>
+              <div id="trackingList"></div>
             </div>
           </div>
 

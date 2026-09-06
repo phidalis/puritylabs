@@ -41,6 +41,7 @@
         </div>
         <a href="pages/coas.html" class="nav-link">COAs</a>
         <a href="pages/about.html" class="nav-link">About Us</a>
+        <a href="contact.html" class="nav-link">Contact</a>
         <a href="mailto:info@puritylabs.org" class="nav-link">info@puritylabs.org</a>
       </nav>
       <div class="header-actions">
@@ -80,6 +81,7 @@
       </div>
       <a href="pages/coas.html" class="mobile-nav-link">COAs</a>
       <a href="pages/about.html" class="mobile-nav-link">About Us</a>
+      <a href="contact.html" class="mobile-nav-link">Contact</a>
       <a href="mailto:info@puritylabs.org" class="mobile-nav-link">info@puritylabs.org</a>
     </div>
   </div>
@@ -117,17 +119,51 @@
         <!-- LEFT: Checkout Form -->
         <form class="checkout-form" id="checkoutForm" novalidate>
 
-          <!-- 1. Contact Information -->
+<!-- 1. Researcher Information -->
           <div class="checkout-section">
             <h2 class="checkout-section-title">
               <span class="step-num">1</span>
-              Contact Information
+              Researcher Information
             </h2>
+
+            <!-- Signed-in researcher card (populated by script.js) -->
+            <div class="researcher-card" id="researcherCard" style="display:none;">
+              <div class="researcher-avatar" id="researcherAvatar">R</div>
+              <div class="researcher-meta">
+                <div class="researcher-name" id="researcherName">Loading…</div>
+                <div class="researcher-email" id="researcherEmail"></div>
+              </div>
+              <span class="researcher-badge"><i class="fa-solid fa-circle-check"></i> Signed in</span>
+              <a href="account.html" class="researcher-manage">Manage account</a>
+            </div>
+
+            <!-- Guest state -->
+            <div class="researcher-guest" id="researcherGuest">
+              <div>
+                <p>Sign in to keep your research credentials saved for faster checkout.</p>
+              </div>
+              <a href="account.html" class="researcher-signin">Sign in / Register</a>
+            </div>
+
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label" for="checkoutEmail">Email Address *</label>
                 <input type="email" id="checkoutEmail" class="form-input" placeholder="you@example.com" required>
                 <span class="form-error" id="emailError">Please enter a valid email address.</span>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="researchField">Research Field *</label>
+                <select id="researchField" class="form-input" required>
+                  <option value="">Select your research field&hellip;</option>
+                  <option value="Private Researcher">Private Researcher</option>
+                  <option value="Clinic">Clinic</option>
+                  <option value="Distributor">Distributor</option>
+                  <option value="University">University</option>
+                  <option value="Other">Other</option>
+                </select>
+                <span class="form-error" id="researchFieldError">Please select your research field.</span>
               </div>
             </div>
           </div>
@@ -266,7 +302,20 @@
           <div class="checkout-summary-items" id="checkoutSummaryItems">
             <!-- Populated by JS -->
           </div>
-          <div class="checkout-summary-divider"></div>
+<div class="checkout-summary-divider"></div>
+
+          <!-- Coupon -->
+          <div class="coupon-applied" id="couponApplied" style="display:none;">
+            <span class="coupon-applied-code"><i class="fa-solid fa-ticket"></i><b id="couponAppliedCode"></b></span>
+            <span class="coupon-applied-save" id="couponAppliedSave"></span>
+            <button type="button" class="coupon-remove" id="couponRemove" aria-label="Remove coupon">×</button>
+          </div>
+          <div class="coupon-box">
+            <input type="text" id="couponCode" class="coupon-input" placeholder="Coupon code" autocomplete="off" spellcheck="false">
+            <button type="button" class="coupon-apply" id="couponApply">Apply</button>
+          </div>
+          <div class="coupon-msg" id="couponMsg"></div>
+
           <div class="checkout-summary-row">
             <span class="label">Subtotal</span>
             <span class="value" id="checkoutSubtotal">$0.00</span>
@@ -278,6 +327,10 @@
           <div class="checkout-summary-row tax">
             <span class="label">Tax estimate</span>
             <span class="value" id="checkoutTax">$0.00</span>
+          </div>
+          <div class="checkout-summary-row discount" id="discountRow" style="display:none;">
+            <span class="label" id="discountLabel">Coupon</span>
+            <span class="value" id="checkoutDiscount">-$0.00</span>
           </div>
           <div class="checkout-summary-total">
             <span>Total</span>
@@ -434,12 +487,14 @@ All products are sold for research, laboratory, or analytical purposes only, and
       e.target.value = v;
     });
 
-    // Clear error on input
+// Clear error on input
     document.querySelectorAll('.form-input').forEach(input => {
-      input.addEventListener('input', () => {
-        input.classList.remove('error');
-        const errEl = input.parentElement.querySelector('.form-error');
-        if (errEl) errEl.classList.remove('show');
+      ['input', 'change'].forEach(evt => {
+        input.addEventListener(evt, () => {
+          input.classList.remove('error');
+          const errEl = input.parentElement.querySelector('.form-error');
+          if (errEl) errEl.classList.remove('show');
+        });
       });
     });
 

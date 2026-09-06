@@ -103,6 +103,23 @@ service cloud.firestore {
 
 
     /* ============================================================
+       ORDER TRACKING — public read so a tracking code entered on the
+       Contact page (or dashboard) shows status progress + admin notes.
+       Stores no PII: only order code, status, items, totals and the
+       status-history timeline. The storefront creates the first entry
+       on placement; admins append entries when a status changes.
+       ============================================================ */
+
+    match /tracking/{id} {
+      allow read: if true;
+      allow create: if isAdmin()
+        || (request.resource.data.orderId == id
+          && (request.resource.data.status == 'processing' || request.resource.data.status == 'pending'));
+      allow update, delete: if isAdmin();
+    }
+
+
+    /* ============================================================
        NEWSLETTER — storefront visitors subscribe by email (public create),
        only admin can read/delete the subscriber list.
        ============================================================ */

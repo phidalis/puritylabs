@@ -143,7 +143,7 @@ function dec(s) { return decodeURIComponent(escape(atob(String(s)))); }
 function keyArg(id) { return String(id).replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
 
 // ===== FIREBASE STATE =====
-const DB = { user: null, cart: [], wishlist: [], products: [], settings: {}, content: {} };
+const DB = { user: null, cart: [], wishlist: [], products: [], settings: {}, content: {}, coupon: null };
 
 // ===== EMAIL CLIENT (Resend via /api) =====
 // Hosted on the same Render service, so /api/… works in the browser with no
@@ -568,6 +568,7 @@ function startFirebase() {
     updateAuthUI();
     updateCartCount();
     renderSideCart();
+    prefillResearcherInfo();
     if (cartUnsub) { cartUnsub(); cartUnsub = null; }
     if (wishUnsub) { wishUnsub(); wishUnsub = null; }
     DB.cart = [];
@@ -592,6 +593,61 @@ function startFirebase() {
       renderCheckoutSummary();
     }
   });
+}
+
+/* Pre-fill the checkout "Researcher Information" section with the signed-in
+   user's credentials (name, email, research field), or show the guest prompt. */
+function prefillResearcherInfo() {
+  const form = document.getElementById('checkoutForm');
+  if (!form) return;
+  const card = document.getElementById('researcherCard');
+  const guest = document.getElementById('researcherGuest');
+  const emailInput = document.getElementById('checkoutEmail');
+  const rf = document.getElementById('researchField');
+  const avatar = document.getElementById('researcherAvatar');
+  const nameEl = document.getElementById('researcherName');
+  const emailShow = document.getElementById('researcherEmail');
+
+  if (rf && !rf.value && typeof localStorage !== 'undefined') {
+    rf.value = localStorage.getItem('pl_research_field') || '';
+  }
+
+  if (!DB.user) {
+    if (card) card.style.display = 'none';
+    if (guest) guest.style.display = 'flex';
+    if (emailInput) { emailInput.readOnly = false; emailInput.classList.remove('locked'); }
+    return;
+  }
+
+  if (card) card.style.display = 'flex';
+  if (guest) guest.style.display = 'none';
+
+  const name = DB.user.name || '';
+  if (avatar) avatar.textContent = (name || 'R')[0].toUpperCase();
+  if (nameEl) nameEl.textContent = name || 'Researcher';
+  if (emailShow) emailShow.textContent = DB.user.email || '';
+
+  if (emailInput) {
+    if (!emailInput.value) emailInput.value = DB.user.email || '';
+    emailInput.readOnly = true;
+    emailInput.classList.add('locked');
+  }
+
+  PDB.getDoc('users', DB.user.uid)
+    .then((prof) => {
+      if (!prof) return;
+      if (nameEl && prof.name) nameEl.textContent = prof.name;
+      if (avatar && prof.name) avatar.textContent = String(prof.name)[0].toUpperCase();
+      if (rf && prof.researchField && !rf.value) rf.value = prof.researchField;
+      if (prof.name) {
+        const parts = String(prof.name).trim().split(/\s+/);
+        const first = document.getElementById('firstName');
+        const last = document.getElementById('lastName');
+        if (first && !first.value) first.value = parts[0] || '';
+        if (last && !last.value) last.value = parts.slice(1).join(' ') || '';
+      }
+    })
+    .catch(() => {});
 }
 
 /* Move a guest cart from localStorage into the signed-in user's Firestore
@@ -694,6 +750,114 @@ function getShippingCost() {
   return 0;
 }
 
+/* ---------- coupons ---------- */
+function couponDiscount(subtotal) {
+  const c = DB.coupon;
+  if (!c) return 0;
+  const raw = c.type === 'percent' ? subtotal * ((c.value || 0) / 100) : (c.value || 0);
+  return Math.round(Math.min(Math.max(raw, 0), subtotal) * 100) / 100;
+}
+
+function couponEls() {
+  return {
+    input: document.getElementById('couponCode'),
+    apply: document.getElementById('couponApply'),
+    applied: document.getElementById('couponApplied'),
+    appliedCode: document.getElementById('couponAppliedCode'),
+    appliedSave: document.getElementById('couponAppliedSave'),
+    remove: document.getElementById('couponRemove'),
+    msg: document.getElementById('couponMsg')
+  };
+}
+
+function setCouponMsg(txt, ok) {
+  const m = document.getElementById('couponMsg');
+  if (!m) return;
+  m.textContent = txt || '';
+  m.classList.toggle('ok', !!ok);
+  m.classList.toggle('error', !!txt && !ok);
+}
+
+function validateCoupon(cp, subtotal) {
+  const errs = [];
+  if (!cp || !cp.code) { errs.push('That coupon code was not found.'); return errs; }
+  if (cp.active === false) errs.push('That coupon is not active right now.');
+  const exp = new Date(cp.expires);
+  if (!isNaN(exp.getTime()) && exp < new Date()) errs.push('That coupon has expired.');
+  if (cp.maxUses != null && (cp.uses || 0) >= cp.maxUses) errs.push('That coupon has reached its usage limit.');
+  if (subtotal < (cp.min || 0)) errs.push('That coupon requires a minimum order of $' + (+cp.min || 0).toFixed(2) + '.');
+  return errs;
+}
+
+function renderCouponState() {
+  const els = couponEls();
+  if (!els.applied) return;
+  const c = DB.coupon;
+  if (c) {
+    els.applied.style.display = 'flex';
+    if (els.appliedCode) els.appliedCode.textContent = c.code.toUpperCase();
+    if (els.appliedSave) els.appliedSave.textContent = c.type === 'percent' ? (c.value || 0) + '% off' : '$' + (+c.value || 0).toFixed(2) + ' off';
+    if (els.input && els.apply) { els.input.style.display = 'none'; els.apply.style.display = 'none'; }
+  } else {
+    els.applied.style.display = 'none';
+    if (els.input && els.apply) { els.input.style.display = ''; els.apply.style.display = ''; }
+  }
+}
+
+function applyCouponCode() {
+  const els = couponEls();
+  const code = (els.input ? els.input.value : '').trim().toUpperCase();
+  if (!code) { setCouponMsg('Enter a coupon code first.'); return; }
+  setCouponMsg('');
+  const subtotal = getCartTotal();
+  PDB.getCol('coupons')
+    .then((list) => {
+      const cp = (list || []).find(c => (c.code || '').toUpperCase() === code);
+      const errs = validateCoupon(cp, subtotal);
+      if (errs.length) {
+        DB.coupon = null;
+        if (typeof localStorage !== 'undefined') localStorage.removeItem('pl_coupon_code');
+        renderCouponState();
+        renderCheckoutSummary();
+        setCouponMsg(errs[0]);
+        return;
+      }
+      DB.coupon = cp;
+      if (typeof localStorage !== 'undefined') localStorage.setItem('pl_coupon_code', cp.code);
+      renderCouponState();
+      renderCheckoutSummary();
+      setCouponMsg('Coupon applied — you saved $' + couponDiscount(subtotal).toFixed(2) + '.', true);
+    })
+    .catch(() => setCouponMsg('Could not check the coupon right now. Try again.'));
+}
+
+function removeCoupon() {
+  DB.coupon = null;
+  if (typeof localStorage !== 'undefined') localStorage.removeItem('pl_coupon_code');
+  renderCouponState();
+  renderCheckoutSummary();
+  setCouponMsg('');
+}
+
+function restoreCoupon() {
+  if (typeof localStorage === 'undefined') return;
+  const code = localStorage.getItem('pl_coupon_code');
+  if (!code) return;
+  const subtotal = getCartTotal();
+  PDB.getCol('coupons')
+    .then((list) => {
+      const cp = (list || []).find(c => (c.code || '').toUpperCase() === code.toUpperCase());
+      if (cp && validateCoupon(cp, subtotal).length === 0) {
+        DB.coupon = cp;
+        renderCouponState();
+        renderCheckoutSummary();
+      } else {
+        localStorage.removeItem('pl_coupon_code');
+      }
+    })
+    .catch(() => {});
+}
+
 function validateCheckoutForm() {
   let valid = true;
   document.querySelectorAll('.form-error').forEach(el => el.classList.remove('show'));
@@ -711,6 +875,9 @@ function validateCheckoutForm() {
 
   const email = document.getElementById('checkoutEmail').value.trim();
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) fail('emailError', 'checkoutEmail');
+
+  const researchField = document.getElementById('researchField');
+  if (researchField && !researchField.value) fail('researchFieldError', 'researchField');
 
   if (!document.getElementById('firstName').value.trim()) fail('firstNameError', 'firstName');
   if (!document.getElementById('lastName').value.trim()) fail('lastNameError', 'lastName');
@@ -756,6 +923,24 @@ function initCheckoutPage() {
     r.addEventListener('change', renderCheckoutSummary);
   });
 
+  const researchField = document.getElementById('researchField');
+  if (researchField) {
+    researchField.addEventListener('change', () => {
+      if (typeof localStorage !== 'undefined') localStorage.setItem('pl_research_field', researchField.value);
+    });
+  }
+
+  const couponApply = document.getElementById('couponApply');
+  const couponInput = document.getElementById('couponCode');
+  const couponRemove = document.getElementById('couponRemove');
+  if (couponApply) couponApply.addEventListener('click', applyCouponCode);
+  if (couponInput) couponInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); applyCouponCode(); }
+  });
+  if (couponRemove) couponRemove.addEventListener('click', removeCoupon);
+  renderCouponState();
+  restoreCoupon();
+
   checkoutForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const v = validateCheckoutForm();
@@ -788,10 +973,11 @@ function saveOrder() {
   const cart = cartList();
   if (!cart.length) return Promise.reject(new Error('Your cart is empty.'));
   const subtotal = getCartTotal();
+  const discount = couponDiscount(subtotal);
   const shipping = getShippingCost();
   const taxRate = +((DB.settings && DB.settings.taxRate) || 0);
-  const tax = Math.round((subtotal + shipping) * taxRate * 100) / 100;
-  const total = subtotal + shipping + tax;
+  const tax = Math.round((subtotal - discount + shipping) * taxRate * 100) / 100;
+  const total = subtotal - discount + shipping + tax;
   const name = (form.querySelector('#firstName')?.value || '') + ' ' + (form.querySelector('#lastName')?.value || '');
   const email = form.querySelector('#checkoutEmail')?.value || '';
   const order = {
@@ -799,9 +985,12 @@ function saveOrder() {
     customerId: DB.user ? DB.user.uid : 'guest',
     customer: (DB.user && DB.user.name) || name.trim() || 'Guest Customer',
     email: (email || (DB.user && DB.user.email) || '').trim(),
+    researchField: (form.querySelector('#researchField')?.value || '').trim(),
     date: new Date().toISOString(),
     items: cart.map(it => ({ name: it.name, variation: it.variation || '', qty: it.qty, price: it.price || 0 })),
     subtotal,
+    discount,
+    couponCode: DB.coupon ? DB.coupon.code.toUpperCase() : '',
     shipping,
     tax,
     total,
@@ -815,10 +1004,30 @@ function saveOrder() {
     method: 'Credit Card'
   };
   if (!DB.user) order.isGuest = true;
-  return PDB.setDoc('orders', order.id, order, { merge: false }).then(() => {
-    if (window.PurityMail) PurityMail.sendOrder(order);
-    return order;
-  });
+  const trackingEntry = {
+    status: 'processing',
+    message: 'Order received. We will update you as it moves through fulfillment.',
+    at: new Date().toISOString()
+  };
+  order.tracking = [trackingEntry];
+  return PDB.setDoc('orders', order.id, order, { merge: false })
+    .then(() => PDB.setDoc('tracking', order.id, {
+      orderId: order.id,
+      status: order.status,
+      items: order.items,
+      subtotal: order.subtotal,
+      shipping: order.shipping,
+      tax: order.tax,
+      total: order.total,
+      tracking: order.tracking,
+      updatedAt: new Date().toISOString()
+    }, { merge: false }))
+    .then(() => {
+      DB.coupon = null;
+      if (typeof localStorage !== 'undefined') localStorage.removeItem('pl_coupon_code');
+      if (window.PurityMail) PurityMail.sendOrder(order);
+      return order;
+    });
 }
 
 function renderCheckoutSummary() {
@@ -840,16 +1049,30 @@ function renderCheckoutSummary() {
   }).join('');
 
   const subtotal = getCartTotal();
+  const discount = couponDiscount(subtotal);
   const shipping = getShippingCost();
   const taxRate = +((DB.settings && DB.settings.taxRate) || 0);
-  const tax = Math.round((subtotal + shipping) * taxRate * 100) / 100;
-  const total = subtotal + shipping + tax;
+  const tax = Math.round((subtotal - discount + shipping) * taxRate * 100) / 100;
+  const total = subtotal - discount + shipping + tax;
 
   const fill = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
   fill('checkoutSubtotal', '$' + subtotal.toFixed(2));
   fill('checkoutShipping', shipping === 0 ? 'FREE' : '$' + shipping.toFixed(2));
   fill('checkoutTax', '$' + tax.toFixed(2));
   fill('checkoutTotal', '$' + total.toFixed(2));
+
+  const discRow = document.getElementById('discountRow');
+  if (discRow) {
+    if (discount > 0) {
+      discRow.style.display = 'flex';
+      const dl = document.getElementById('discountLabel');
+      if (dl) dl.textContent = 'Coupon (' + ((DB.coupon && DB.coupon.code) || '').toUpperCase() + ')';
+      const dv = document.getElementById('checkoutDiscount');
+      if (dv) dv.textContent = '-$' + discount.toFixed(2);
+    } else {
+      discRow.style.display = 'none';
+    }
+  }
 }
 
 // ===== LIVE STOREFRONT (products from Firestore) =====
@@ -988,27 +1211,6 @@ function initLiveProduct() {
       desc.innerHTML = '<h3>Description</h3>' +
         (p.desc ? '<p>' + String(p.desc).replace(/\r?\n+/g, '</p><p>') + '</p>' : '<p>' + esc(name) + '</p>') +
         '<p><strong>Research Use Only:</strong> This product is intended solely for laboratory research. Not for human consumption or therapeutic use.</p>';
-    }
-
-    const relSection = single.querySelector('#relatedSection');
-    const relGrid = single.querySelector('#relatedProducts');
-    if (relGrid) {
-      const rel = Array.isArray(p.related) ? p.related.slice(0, 4) : [];
-      relGrid.innerHTML = '';
-      if (!rel.length) {
-        if (relSection) relSection.style.display = 'none';
-      } else {
-        PDB.getColCached('products').then(list => {
-          const map = (list || []).filter(x => x.status !== 'hidden' && x.slug);
-          const cards = rel.map(s => map.find(x => x.slug === s)).filter(Boolean).map(cardHTML);
-          if (cards.length) {
-            relGrid.innerHTML = cards.join('\n');
-            updateWishlistFlags();
-          } else if (relSection) {
-            relSection.style.display = 'none';
-          }
-        }).catch(() => { if (relSection) relSection.style.display = 'none'; });
-      }
     }
 
     const currentCat = p.cat === 'sprays' ? 'nasal-sprays.html' : (p.cat === 'pills' ? 'pills.html' : 'all-peptides.html');
@@ -1163,6 +1365,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initCartPage();
   initCheckoutPage();
   startFirebase();
+  prefillResearcherInfo();
   initLiveStorefront();
   initLiveCOAs();
   startEmailConfig();

@@ -106,6 +106,11 @@ window.PDB = (function () {
       }
       db = app.firestore();
       auth = app.auth();
+      // Default Firebase web persistence is already browser-local; we assert it
+      // explicitly so a signed-up account stays logged in on this device.
+      if (auth && auth.setPersistence && !auth.currentUser) {
+        Promise.resolve(auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)).catch(function () {});
+      }
       ready = true;
     } catch (e) {
       // Firebase misconfigured — every async call rejects with a clear message.

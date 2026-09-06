@@ -19,6 +19,7 @@ const todayStr = () => new Date().toISOString();
 const uid = () => 'id-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 const daysAgo = (n) => { const d = new Date(); d.setDate(d.getDate() - n); return d.toISOString(); };
 const fmtDate = (iso) => { try { return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); } catch { return '—'; } };
+const fmtDt = (iso) => { try { return new Date(iso).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); } catch { return '—'; } };
 
 /* ---------------- cloudinary unsigned uploads ---------------- */
 const CLOUD_NAME = 'qqwevfkz';
@@ -820,9 +821,12 @@ function renderOrders() {
               <td style="white-space:nowrap;">${fmtDate(o.date)}</td>
               <td>${o.items.reduce((s, i) => s + i.qty, 0)}</td>
               <td><b style="color:var(--ink);">${money(o.total)}</b></td>
-              <td><select class="ord-status" style="width:auto;padding:6px 10px;font-size:.8rem;" data-order="${o.id}">
+              <td><div style="display:flex;gap:6px;align-items:center;">
+                <select class="ord-status" style="width:auto;padding:6px 10px;font-size:.8rem;" data-order="${o.id}">
                 ${['pending','processing','shipped','completed','refunded','cancelled'].map(s => `<option ${o.status === s ? 'selected' : ''}>${s}</option>`).join('')}
-              </select></td>
+                </select>
+                <input type="text" class="ord-note" data-order="${o.id}" placeholder="optional note…" style="width:118px;padding:6px 8px;font-size:.78rem;border:1px solid var(--line);border-radius:6px;background:#fff;">
+              </div></td>
               <td><div class="actions">
                 <button class="icon-action" data-view-order="${o.id}"><i class="fa-solid fa-eye"></i></button>
                 <button class="icon-action danger" data-del-order="${o.id}"><i class="fa-solid fa-trash"></i></button>
@@ -849,12 +853,25 @@ function renderOrders() {
     const o = byId('orders', b.dataset.delOrder);
     askConfirm('Delete order?', o.id + ' · ' + money(o.total) + ' will be permanently removed.', () => {
       DB.orders = DB.orders.filter(x => x.id !== o.id); persistAll(); renderOrders(); toast('Order deleted.');
+      PDB.delDoc('tracking', o.id).catch(() => {});
     });
   }));
   $$('[data-new-order]').forEach(b => b.addEventListener('click', newOrderForm));
   $$('.ord-status').forEach(sel => sel.addEventListener('change', () => {
     const o = byId('orders', sel.dataset.order);
-    o.status = sel.value; persistAll(); renderOrders(); renderNav(); toast('Order ' + o.id + ' → ' + sel.value);
+    if (!o) return;
+    const note = $('[data-order="' + o.id + '"].ord-note');
+    const msg = (note && note.value || '').trim();
+    const at = new Date().toISOString();
+    const entry = { status: sel.value, message: msg, at: at };
+    o.status = sel.value;
+    o.tracking = (o.tracking || []).concat(entry);
+    o.updatedAt = at;
+    persistAll(); renderOrders(); renderNav(); toast('Order ' + o.id + ' → ' + sel.value + (msg ? ' (+ note)' : ''));
+    PDB.setDoc('tracking', o.id, {
+      orderId: o.id, status: o.status, items: o.items || [], subtotal: o.subtotal,
+      shipping: o.shipping, tax: o.tax, total: o.total, tracking: o.tracking, updatedAt: at
+    }, { merge: true }).catch(() => {});
   }));
 }
 
@@ -875,6 +892,17 @@ function viewOrder(id) {
     <div style="display:flex;flex-direction:column;gap:8px;font-size:.9rem;margin-bottom:14px;">
       ${[['Subtotal', money(o.subtotal)], ['Shipping', money(o.shipping)], ['Total', money(o.total)], ['Payment', esc(o.method + ' ' + (o.payment || ''))], ['Placed', fmtDate(o.date)]]
         .map(([k, v]) => `<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">${k}</span><b style="color:var(--ink);">${v}</b></div>`).join('')}
+    </div>
+    <div style="border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:14px;">
+      <div style="font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Tracking</div>
+      ${(o.tracking || []).length ? o.tracking.slice().reverse().map((st, i) => {
+        const c = statusCls(st.status);
+        return `<div style="border-left:2px solid ${i === 0 ? 'var(--primary)' : 'var(--line)'};padding:0 0 12px 12px;position:relative;">
+          <div style="position:absolute;left:-5px;top:5px;width:8px;height:8px;border-radius:50%;background:${i === 0 ? 'var(--primary)' : 'var(--line)'};"></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span class="badge ${c}">${esc(st.status)}</span><span style="font-size:.76rem;color:var(--muted);">${fmtDt(st.at)}</span></div>
+          ${st.message ? `<div style="font-size:.84rem;color:var(--ink);margin-top:3px;">${esc(st.message)}</div>` : ''}
+        </div>`;
+      }).join('') : '<div style="font-size:.84rem;color:var(--muted);">No tracking updates yet. Change the status to add one.</div>'}
     </div>`,
     '<button class="btn btn-ghost" data-close-modal>Close</button>');
 }
@@ -935,9 +963,14 @@ function newOrderForm() {
     if (!items.length) { toast('Add at least one item.', 'error'); return; }
     const sub = items.reduce((s, i) => s + i.price * i.qty, 0);
     const shipping = sub >= DB.settings.freeShipThreshold ? 0 : +DB.settings.flatRate;
-    const rec = { id: 'ORD-' + (7843 + DB.orders.length), customer: cust, email, date: todayStr(), items, subtotal: sub, shipping, total: sub + shipping, status: 'pending', payment: 'Manual', method: '—' };
+    const at = todayStr();
+    const rec = { id: 'ORD-' + (7843 + DB.orders.length), customer: cust, email, date: at, items, subtotal: sub, shipping, total: sub + shipping, status: 'pending', payment: 'Manual', method: '—', updatedAt: at, tracking: [{ status: 'pending', message: 'Manual order created by admin.', at: at }] };
     DB.orders.unshift(rec);
     persistAll(); closeModal(); renderOrders();
+    PDB.setDoc('tracking', rec.id, {
+      orderId: rec.id, status: rec.status, items: rec.items, subtotal: rec.subtotal,
+      shipping: rec.shipping, tax: 0, total: rec.total, tracking: rec.tracking, updatedAt: at
+    }, { merge: true }).catch(() => {});
     toast('Manual order ' + rec.id + ' created.');
   });
 }
